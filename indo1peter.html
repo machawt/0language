@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1 Peter - Audio Phrase Matcher (Full Book)</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f4f8; padding: 20px; text-align: center; color: #2c3e50; }
+        .box { background: white; padding: 25px; border-radius: 12px; max-width: 600px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        select, input, button { width: 100%; padding: 12px; margin: 10px 0; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background: #2980b9; color: white; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        button:hover { background: #1f618d; }
+        .btn-audio { background: #2ecc71; margin-bottom: 15px; font-size: 18px; padding: 15px; }
+        .btn-audio:hover { background: #27ae60; }
+        .verse-text { background: #f9f9f9; padding: 15px; border-left: 4px solid #2980b9; text-align: left; font-size: 1.15rem; font-weight: bold; line-height: 1.5; }
+        .interactive-target { background: #eef2f7; cursor: pointer; transition: background 0.2s, border-color 0.2s; user-select: none; }
+        .interactive-target:hover { background: #e2e8f0; border-left-color: #e67e22; }
+        .hidden { display: none; }
+        .status { font-weight: bold; padding: 10px; margin: 10px 0; border-radius: 6px; }
+        .nav-controls { display: flex; gap: 10px; margin-top: 10px; }
+        .nav-controls button { margin: 0; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <!-- SCREEN 1: CHOOSE A PHRASE -->
+    <div id="screen1">
+        <h2>1 Peter Phrase Matcher</h2>
+        <p style="color: #7f8c8d; font-size: 14px;">Select a verse section from Chapters 1-5 to practice:</p>
+        
+        <select id="phraseSelector" onchange="updatePreview()"></select>
+        
+        <p style="text-align: left; margin: 15px 0 5px 0; font-weight: bold; color: #7f8c8d;">English Meaning:</p>
+        <div class="verse-text" id="previewBox">Loading phrases...</div>
+        <button onclick="startPractice()">Start Practice</button>
+    </div>
+
+    <!-- SCREEN 2: GAMEPLAY -->
+    <div id="screen2" class="hidden">
+        <h2 id="phraseLabel">Practice Mode</h2>
+        <p style="color: #7f8c8d; font-size: 14px;">Listen to the spoken audio, then type the Indonesian words:</p>
+        
+        <!-- AUDIO BUTTON -->
+        <button class="btn-audio" onclick="playAudio()">
+            🔊 Listen (Hear Indonesian Words)
+        </button>
+
+        <p style="text-align: left; margin: 5px 0; font-weight: bold; color: #7f8c8d;">Target Prompt (Tap/Click box to peek at Indonesian):</p>
+        <div class="verse-text interactive-target" id="targetPhrase" onclick="peekIndonesian()"></div>
+        
+        <input type="text" id="userInput" placeholder="Type the Indonesian words you hear..." autocomplete="off" oninput="liveCheck()">
+        
+        <div id="result" class="status"></div>
+        
+        <div class="nav-controls">
+            <button onclick="skipPhrase()" style="background:#f39c12;">Skip Phrase</button>
+            <button onclick="goBack()" style="background:#95a5a6;">Change Phrase</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Full dataset for 1 Peter Chapters 1-5
+    const bibleData = [
+        // CHAPTER 1
+        { id: "1 Pet 1:1a", ind: "Dari Petrus, rasul Yesus Kristus", eng: "Peter, an apostle of Jesus Christ" },
+        { id: "1 Pet 1:1b", ind: "kepada orang-orang pendatang", eng: "To the pilgrims of the Dispersion" },
+        { id: "1 Pet 1:1c", ind: "yang tersebar di Pontus, Galatia, Kapadokia, Asia Kecil dan Bitinia", eng: "scattered throughout Pontus, Galatia, Cappadocia, Asia, and Bithynia" },
+        { id: "1 Pet 1:2a", ind: "yaitu orang-orang yang dipilih", eng: "elect according to the foreknowledge" },
+        { id: "1 Pet 1:2b", ind: "sesuai dengan rencana Allah, Bapa kita", eng: "according to the plan of God our Father" },
+        { id: "1 Pet 1:2c", ind: "dan yang dikuduskan oleh Roh", eng: "and sanctified by the Spirit" },
+        { id: "1 Pet 1:2d", ind: "supaya taat kepada Yesus Kristus", eng: "for obedience to Jesus Christ" },
+        { id: "1 Pet 1:2e", ind: "dan menerima percikan darah-Nya", eng: "and sprinkling of His blood" },
+        { id: "1 Pet 1:2f", ind: "Kiranya kasih karunia dan damai sejahtera makin melimpah atas kamu", eng: "Grace to you and peace be multiplied" },
+        { id: "1 Pet 1:3a", ind: "Terpujilah Allah dan Bapa Tuhan kita Yesus Kristus", eng: "Blessed be the God and Father of our Lord Jesus Christ" },
+        { id: "1 Pet 1:3b", ind: "yang karena rahmat-Nya yang besar telah melahirkan kita kembali", eng: "who according to His abundant mercy has begotten us again" },
+        { id: "1 Pet 1:3c", ind: "oleh kebangkitan Yesus Kristus dari antara orang mati", eng: "through the resurrection of Jesus Christ from the dead" },
+        { id: "1 Pet 1:3d", ind: "kepada suatu hidup yang penuh pengharapan", eng: "to a living hope" },
+        { id: "1 Pet 1:4a", ind: "untuk menerima suatu bagian yang tidak dapat binasa", eng: "to an inheritance incorruptible" },
+        { id: "1 Pet 1:4b", ind: "yang tidak dapat cemar dan yang tidak dapat layu", eng: "and undefiled and that does not fade away" },
+        { id: "1 Pet 1:4c", ind: "yang tersimpan di sorga bagi kamu", eng: "reserved in heaven for you" },
+        { id: "1 Pet 1:5a", ind: "Yaitu kamu, yang dipelihara dalam kekuatan Allah", eng: "who are kept by the power of God" },
+        { id: "1 Pet 1:5b", ind: "karena imanmu sementara kamu menantikan keselamatan", eng: "through faith for salvation" },
+        { id: "1 Pet 1:5c", ind: "yang telah siap untuk dinyatakan pada zaman akhir", eng: "ready to be revealed in the last time" },
+        { id: "1 Pet 1:6a", ind: "Bergembiralah akan hal itu", eng: "In this you greatly rejoice" },
+        { id: "1 Pet 1:6b", ind: "sekalipun sekarang ini kamu seketika harus berdukacita", eng: "though now for a little while, if need be, you have been grieved" },
+        { id: "1 Pet 1:6c", ind: "oleh berbagai-bagai pencobaan", eng: "by various trials" },
+        { id: "1 Pet 1:7a", ind: "Maksud semuanya itu ialah untuk membuktikan kemurnian imanmu", eng: "that the genuineness of your faith" },
+        { id: "1 Pet 1:7b", ind: "yang jauh lebih tinggi nilainya dari pada emas yang fana", eng: "being much more precious than gold that perishes" },
+        { id: "1 Pet 1:7c", ind: "yang diuji kemurniannya dengan api", eng: "though it is tested by fire" },
+        { id: "1 Pet 1:7d", ind: "sehingga kamu memperoleh puji-pujian dan kemuliaan dan kehormatan", eng: "may be found to praise, honor, and glory" },
+        { id: "1 Pet 1:7e", ind: "pada hari Yesus Kristus menyatakan diri-Nya", eng: "at the revelation of Jesus Christ" },
+        { id: "1 Pet 1:8a", ind: "Sekalipun kamu belum pernah melihat Dia, namun kamu mengasihi-Nya", eng: "whom having not seen you love" },
+        { id: "1 Pet 1:8b", ind: "Kamu percaya kepada Dia, sekalipun kamu sekarang tidak melihat-Nya", eng: "Though now you do not see Him, yet believing" },
+        { id: "1 Pet 1:8c", ind: "Kamu bergembira karena sukacita yang mulia dan yang tidak terkatakan", eng: "you rejoice with joy inexpressible and full of glory" },
+        { id: "1 Pet 1:9", ind: "karena kamu telah mencapai tujuan imanmu, yaitu keselamatan jiwamu", eng: "receiving the end of your faith—the salvation of your souls" },
+        { id: "1 Pet 1:10a", ind: "Keselamatan itulah yang diselidiki dan diteliti oleh nabi-nabi", eng: "Of this salvation the prophets have inquired and searched carefully" },
+        { id: "1 Pet 1:10b", ind: "yang telah bernubuat tentang kasih karunia yang diuntukkan bagimu", eng: "who prophesied of the grace that would come to you" },
+        { id: "1 Pet 1:11a", ind: "Dan mereka meneliti saat yang mana dan yang bagaimana", eng: "searching what, or what manner of time" },
+        { id: "1 Pet 1:11b", ind: "yang dimaksudkan oleh Roh Kristus, yang ada di dalam mereka", eng: "the Spirit of Christ who was in them was indicating" },
+        { id: "1 Pet 1:11c", ind: "ketika Ia sebelumnya memberi kesaksian tentang segala penderitaan", eng: "when He testified beforehand the sufferings of Christ" },
+        { id: "1 Pet 1:11d", ind: "yang akan menimpa Kristus dan tentang kemuliaan yang menyusul sesudah itu", eng: "and the glories that would follow" },
+        { id: "1 Pet 1:12a", ind: "Kepada mereka telah dinyatakan, bahwa mereka bukan melayani diri mereka sendiri", eng: "To them it was revealed that, not to themselves, but to us they were ministering" },
+        { id: "1 Pet 1:12b", ind: "tetapi melayani kamu dengan segala sesuatu yang telah diberitakan", eng: "the things which have now been reported to you" },
+        { id: "1 Pet 1:12c", ind: "oleh mereka, yang oleh Roh Kudus yang diutus dari sorga", eng: "through those who have preached the gospel to you by the Holy Spirit sent from heaven" },
+        { id: "1 Pet 1:12d", ind: "menyampaikan Berita Injil kepada kamu", eng: "things which angels desire to look into" },
+        { id: "1 Pet 1:13a", ind: "Sebab itu siapkanlah akal budimu, waspadalah", eng: "Therefore gird up the loins of your mind, be sober" },
+        { id: "1 Pet 1:13b", ind: "dan letakkanlah pengharapanmu seluruhnya atas kasih karunia", eng: "and rest your hope fully upon the grace" },
+        { id: "1 Pet 1:13c", ind: "yang karuniakan kepadamu pada waktu penyataan Yesus Kristus", eng: "that is to be brought to you at the revelation of Jesus Christ" },
+        { id: "1 Pet 1:14", ind: "Hiduplah sebagai anak-anak yang taat dan jangan turuti hawa nafsu", eng: "as obedient children, not conforming yourselves to the former lusts" },
+        { id: "1 Pet 1:15", ind: "tetapi hendaklah kamu menjadi kudus di dalam seluruh hidupmu", eng: "but as He who called you is holy, you also be holy in all your conduct" },
+        { id: "1 Pet 1:16", ind: "sebab ada tertulis: Kuduslah kamu, sebab Aku kudus", eng: "because it is written, 'Be holy, for I am holy.'" },
+        { id: "1 Pet 1:17a", ind: "Dan jikalau kamu menyebut-Nya Bapa, yaitu Dia yang menghakimi", eng: "And if you call on the Father, who without partiality judges" },
+        { id: "1 Pet 1:17b", ind: "setiap orang menurut perbuatannya tanpa memandang bulu", eng: "according to each one's work" },
+        { id: "1 Pet 1:17c", ind: "maka hiduplah dalam ketakutan selama waktu perantauanmu", eng: "conduct yourselves throughout the time of your stay here in fear" },
+        { id: "1 Pet 1:18a", ind: "Sebab kamu tahu, bahwa kamu telah ditebus dari cara hidupmu yang sia-sia", eng: "knowing that you were not redeemed with corruptible things" },
+        { id: "1 Pet 1:18b", ind: "yang kamu warisi dari nenek moyangmu itu bukan dengan barang yang fana", eng: "like silver or gold, from your aimless conduct received by tradition" },
+        { id: "1 Pet 1:19a", ind: "melainkan dengan darah yang mahal, yaitu darah Kristus", eng: "but with the precious blood of Christ" },
+        { id: "1 Pet 1:19b", ind: "yang sama seperti darah anak domba yang tak bernoda dan tak bercacat", eng: "as of a lamb without blemish and without spot" },
+        { id: "1 Pet 1:20", ind: "Ia telah dipilih sebelum dunia dijadikan, tetapi baru menyatakan diri-Nya", eng: "He indeed was foreordained before the foundation of the world, but was manifest" },
+        { id: "1 Pet 1:21a", ind: "Oleh Dialah kamu percaya kepada Allah, yang telah membangkitkan Dia", eng: "who through Him believe in God, who raised Him from the dead" },
+        { id: "1 Pet 1:21b", ind: "dari antara orang mati dan yang telah memuliakan-Nya", eng: "and gave Him glory" },
+        { id: "1 Pet 1:21c", ind: "sehingga imanmu dan pengharapanmu tertuju kepada Allah", eng: "so that your faith and hope are in God" },
+        { id: "1 Pet 1:22a", ind: "Karena kamu telah menyucikan dirimu oleh ketaatan kepada kebenaran", eng: "Since you have purified your souls in obeying the truth" },
+        { id: "1 Pet 1:22b", ind: "supaya kamu dapat mengamalkan kasih persaudaraan yang tulus ikhlas", eng: "through the Spirit in sincere love of the brethren" },
+        { id: "1 Pet 1:22c", ind: "hendaklah kamu bersungguh-sungguh saling mengasihi dengan segenap hatimu", eng: "love one another fervently with a pure heart" },
+        { id: "1 Pet 1:23a", ind: "Karena kamu telah dilahirkan kembali bukan dari benih yang fana", eng: "having been born again, not of corruptible seed but incorruptible" },
+        { id: "1 Pet 1:23b", ind: "tetapi dari benih yang tidak fana, oleh firman Allah", eng: "through the word of God which lives and abides forever" },
+        { id: "1 Pet 1:24a", ind: "Sebab: Semua yang hidup adalah seperti rumput", eng: "because 'All flesh is as grass" },
+        { id: "1 Pet 1:24b", ind: "dan segala kemuliaannya seperti bunga rumput", eng: "and all the glory of man as the flower of the grass" },
+        { id: "1 Pet 1:24c", ind: "rumput menjadi kering, dan bunga gugur", eng: "The grass withered, and its flower falls away" },
+        { id: "1 Pet 1:25a", ind: "tetapi firman Tuhan tetap untuk selama-lamanya", eng: "but the word of the Lord endures forever.'" },
+        { id: "1 Pet 1:25b", ind: "Inilah firman yang disampaikan Injil kepada kamu", eng: "Now this is the word which by the gospel was preached to you" },
+
+        // CHAPTER 2
+        { id: "1 Pet 2:1a", ind: "Karena itu buanglah segala kejahatan, segala tipu muslihat", eng: "Therefore, laying aside all malice, all deceit" },
+        { id: "1 Pet 2:1b", ind: "dan segala macam kemunafikan, kedengkian dan fitnah", eng: "hypocrisy, envy, and all evil speaking" },
+        { id: "1 Pet 2:2a", ind: "Dan jadilah sama seperti bayi yang baru lahir", eng: "as newborn babes, desire the pure milk of the word" },
+        { id: "1 Pet 2:2b", ind: "yang selalu ingin akan air susu yang murni dan yang rohani", eng: "that you may grow thereby" },
+        { id: "1 Pet 2:3", ind: "jika kamu benar-benar telah mengecap kebaikan Tuhan", eng: "if indeed you have tasted that the Lord is gracious" },
+        { id: "1 Pet 2:4a", ind: "Dan datanglah kepada-Nya, batu yang hidup itu", eng: "Coming to Him as to a living stone" },
+        { id: "1 Pet 2:4b", ind: "yang memang dibuang oleh manusia, tetapi yang dipilih dan terhormat", eng: "rejected indeed by men, but chosen by God and precious" },
+        { id: "1 Pet 2:5a", ind: "Dan biarlah diri kamu juga dipergunakan sebagai batu hidup", eng: "you also, as living stones, are being built up a spiritual house" },
+        { id: "1 Pet 2:5b", ind: "untuk pembangunan suatu rumah rohani, bagi suatu imamat kudus", eng: "a holy priesthood, to offer up spiritual sacrifices" },
+        { id: "1 Pet 2:5c", ind: "untuk mempersembahkan persembahan rohani yang karena Yesus Kristus", eng: "acceptable to God through Jesus Christ" },
+        { id: "1 Pet 2:6a", ind: "Sebab ada tertulis dalam Kitab Suci: Sesungguhnya, Aku meletakkan di Sion", eng: "Therefore it is also contained in the Scripture, 'Behold, I lay in Zion" },
+        { id: "1 Pet 2:6b", ind: "sebuah batu penjuru, batu pilihan, batu yang mahal", eng: "a chief cornerstone, elect, precious" },
+        { id: "1 Pet 2:6c", ind: "dan siapa yang percaya kepada-Nya, tidak akan dipermalukan", eng: "and he who believes on Him will by no means be put to shame.'" },
+        { id: "1 Pet 2:7a", ind: "Karena itu bagi kamu, yang percaya, ia mahal", eng: "Therefore, to you who believe, He is precious" },
+        { id: "1 Pet 2:7b", ind: "tetapi bagi mereka yang tidak percaya: Batu yang dibuang oleh tukang-tukang bangunan", eng: "but to those who are disobedient, 'The stone which the builders rejected" },
+        { id: "1 Pet 2:7c", ind: "telah menjadi batu penjuru, juga telah menjadi batu sentuhan", eng: "has become the chief cornerstone'" },
+        { id: "1 Pet 2:8a", ind: "dan suatu batu sandungan dan suatu batu sentuhan", eng: "and 'A stone of stumbling and a rock of offense.'" },
+        { id: "1 Pet 2:8b", ind: "Mereka tersandung padanya, karena mereka tidak taat kepada Firman Allah", eng: "They stumble, being disobedient to the word, to which they also were appointed" },
+        { id: "1 Pet 2:9a", ind: "Tetapi kamulah bangsa yang terpilih, imamat yang rajani", eng: "But you are a chosen generation, a royal priesthood" },
+        { id: "1 Pet 2:9b", ind: "bangsa yang kudus, umat kepunyaan Allah sendiri", eng: "a holy nation, His own special people" },
+        { id: "1 Pet 2:9c", ind: "supaya kamu memberitakan perbuatan-perbuatan yang besar dari Dia", eng: "that you may proclaim the praises of Him" },
+        { id: "1 Pet 2:9d", ind: "yang telah memanggil kamu keluar dari kegelapan kepada terang-Nya yang ajaib", eng: "who called you out of darkness into His marvelous light" },
+        { id: "1 Pet 2:10a", ind: "kamu, yang dahulu bukan umat Allah, tetapi yang sekarang telah menjadi umat-Nya", eng: "who once were not a people but are now the people of God" },
+        { id: "1 Pet 2:10b", ind: "kamu, yang dahulu tidak dikasihi tetapi yang sekarang oleh rahmat-Nya", eng: "who had not obtained mercy but now have obtained mercy" },
+        { id: "1 Pet 2:11a", ind: "Saudara-saudaraku yang kekasih, aku menasihati kamu", eng: "Beloved, I beg you as sojourners and pilgrims" },
+        { id: "1 Pet 2:11b", ind: "supaya sebagai pendatang dan perantau, kamu menjauhkan diri", eng: "abstain from fleshly lusts" },
+        { id: "1 Pet 2:11c", ind: "dari keinginan-keinginan daging yang berjuang melawan jiwa", eng: "which war against the soul" },
+        { id: "1 Pet 2:12a", ind: "Milikilah cara hidup yang baik di tengah-tengah bangsa-bangsa bukan Yahudi", eng: "having your conduct honorable among the Gentiles" },
+        { id: "1 Pet 2:12b", ind: "supaya apabila mereka memfitnah kamu sebagai orang durjana", eng: "that when they speak against you as evildoers" },
+        { id: "1 Pet 2:12c", ind: "meraka dapat melihatnya dari perbuatan-perbuatanmu yang baik", eng: "they may, by your good works which they observe" },
+        { id: "1 Pet 2:12d", ind: "dan memuliakan Allah pada hari Ia melawat mereka", eng: "glorify God in the day of visitation" },
+        { id: "1 Pet 2:13", ind: "Tunduklah, karena Tuhan, kepada semua lembaga manusia", eng: "Therefore submit yourselves to every ordinance of man for the Lord's sake" },
+        { id: "1 Pet 2:14", ind: "baik kepada raja sebagai pemegang kekuasaan yang tertinggi", eng: "whether to the king as supreme, or to governors" },
+        { id: "1 Pet 2:15", ind: "Sebab inilah kehendak Allah, supaya dengan berbuat baik kamu membungkamkan", eng: "For this is the intention of God, that by doing good you may put to silence" },
+        { id: "1 Pet 2:16", ind: "Hiduplah sebagai orang merdeka dan bukan seperti mereka", eng: "as free, yet not using liberty as a cloak for vice" },
+        { id: "1 Pet 2:17", ind: "Hormatilah semua orang, kasihilah saudara-saudaramu, takutlah akan Allah", eng: "Honor all people. Love the brotherhood. Fear God. Honor the king." },
+        { id: "1 Pet 2:18", ind: "Hai kamu, hamba-hamba, tunduklah dengan penuh ketakutan kepada tuanmu", eng: "Servants, be submissive to your masters with all fear" },
+        { id: "1 Pet 2:19", ind: "Sebab adalah kasih karunia, jika seorang karena sadar akan kehendak Allah", eng: "For this is commendable, if because of conscience toward God" },
+        { id: "1 Pet 2:20", ind: "Sebab pahala apakah, jika kamu berbuat dosa dan kamu menerima pukulan", eng: "For what credit is it if, when you are beaten for your faults" },
+        { id: "1 Pet 2:21a", ind: "Sebab untuk itulah kamu dipanggil, karena Kristuspun telah menderita", eng: "For to this you were called, because Christ also suffered for us" },
+        { id: "1 Pet 2:21b", ind: "untuk kamu dan telah meninggalkan teladan bagimu", eng: "leaving us an example, that you should follow His steps" },
+        { id: "1 Pet 2:22", ind: "Ia tidak berbuat dosa, dan tipu tidak ada dalam mulut-Nya", eng: "Who committed no sin, nor was deceit found in His mouth" },
+        { id: "1 Pet 2:23a", ind: "Ketika Ia dicaci maki, Ia tidak membalas dengan mencaci maki", eng: "who, when He was reviled, did not revile in return" },
+        { id: "1 Pet 2:23b", ind: "ketika Ia menderita, Ia tidak mengancam", eng: "when He suffered, He did not threaten" },
+        { id: "1 Pet 2:24a", ind: "Ia sendiri telah memikul dosa kita di dalam tubuh-Nya di kayu salib", eng: "who Himself bore our sins in His own body on the tree" },
+        { id: "1 Pet 2:24b", ind: "supaya kita, yang telah mati terhadap dosa, hidup untuk kebenaran", eng: "that we, having died to sins, might live for righteousness" },
+        { id: "1 Pet 2:24c", ind: "Oleh bilur-bilur-Nya kamu telah sembuh", eng: "by whose stripes you were healed" },
+        { id: "1 Pet 2:25", ind: "Sebab kamu dahulu sesat seperti domba, tetapi sekarang kamu telah kembali", eng: "For you were like sheep going astray, but have now returned to the Shepherd" },
+
+        // CHAPTER 3
+        { id: "1 Pet 3:1a", ind: "Demikian juga kamu, hai isteri-isteri, tunduklah kepada suamimu", eng: "Wives, likewise, be submissive to your own husbands" },
+        { id: "1 Pet 3:1b", ind: "supaya jika ada di antara mereka yang tidak taat kepada Firman", eng: "that even if some do not obey the word" },
+        { id: "1 Pet 3:1c", ind: "mereka juga tanpa perkataan dimenangkan oleh kelakuan isterinya", eng: "they, without a word, may be won by the conduct of their wives" },
+        { id: "1 Pet 3:2", ind: "jika mereka melihat, bagaimana murni dan salehnya hidupmu", eng: "when they observe your chaste conduct accompanied by fear" },
+        { id: "1 Pet 3:3", ind: "Perhiasanmu janganlah secara lahiriah, yaitu dengan mengepang-ngepang rambut", eng: "Do not let your adornment be merely outward—arranging the hair" },
+        { id: "1 Pet 3:4a", ind: "melainkan perhiasanmu ialah manusia batiniah yang tersembunyi", eng: "rather let it be the hidden person of the heart" },
+        { id: "1 Pet 3:4b", ind: "dengan perhiasan yang tidak layu yang berasal dari roh yang lemah lembut", eng: "with the incorruptible beauty of a gentle and quiet spirit" },
+        { id: "1 Pet 3:5", ind: "Sebab demikianlah caranya perempuan-perempuan kudus dahulu berdandan", eng: "For in this manner, in former times, the holy women who trusted in God" },
+        { id: "1 Pet 3:6", ind: "sama seperti Sara taat kepada Abraham dan menyebut dia tuannya", eng: "as Sarah obeyed Abraham, calling him lord" },
+        { id: "1 Pet 3:7a", ind: "Demikian juga kamu, hai suami-suami, hiduplah bijaksana dengan isterimu", eng: "Husbands, likewise, dwell with them with understanding" },
+        { id: "1 Pet 3:7b", ind: "sebagai kaum yang lebih lemah! Hormatilah mereka sebagai teman pewaris", eng: "giving honor to the wife, as to the weaker vessel" },
+        { id: "1 Pet 3:7c", ind: "dari kasih karunia, yaitu kehidupan, supaya doamu jangan terhalang", eng: "and as being heirs together of the grace of life, that your prayers may not be hindered" },
+        { id: "1 Pet 3:8a", ind: "Dan akhirnya, hendaklah kamu semua seia sekata, seperasaan", eng: "Finally, all of you be of one mind, having compassion for one another" },
+        { id: "1 Pet 3:8b", ind: "mengasihi saudara-saudara, penyayang dan rendah hati", eng: "love as brothers, be tenderhearted, be courteous" },
+        { id: "1 Pet 3:9a", ind: "dan janganlah membalas kejahatan dengan kejahatan, atau caci maki", eng: "not returning evil for evil or reviling for reviling" },
+        { id: "1 Pet 3:9b", ind: "tetapi sebaliknya, hendaklah kamu memberkati", eng: "but on the contrary, blessing, knowing that you were called to this" },
+        { id: "1 Pet 3:10a", ind: "Siapa yang mau mencintai hidup dan mau melihat hari-hari baik", eng: "He who would love life and see good days" },
+        { id: "1 Pet 3:10b", ind: "hendaklah ia menjaga lidahnya terhadap yang jahat", eng: "let him refrain his tongue from evil" },
+        { id: "1 Pet 3:11", ind: "Ia harus menjauhi yang jahat dan melakukan yang baik", eng: "Let him turn away from evil and do good; let him seek peace and pursue it" },
+        { id: "1 Pet 3:12a", ind: "Sebab mata Tuhan tertuju kepada orang-orang benar", eng: "For the eyes of the Lord are on the righteous" },
+        { id: "1 Pet 3:12b", ind: "dan telinga-Nya kepada permohonan mereka yang minta tolong", eng: "and His ears are open to their prayers" },
+        { id: "1 Pet 3:13", ind: "Dan siapakah yang akan berbuat jahat kepada kamu, jika kamu rajin berbuat baik", eng: "And who is he who will harm you if you become followers of what is good?" },
+        { id: "1 Pet 3:14a", ind: "Tetapi sekalipun kamu harus menderita juga karena kebenaran", eng: "But even if you should suffer for righteousness' sake, you are blessed" },
+        { id: "1 Pet 3:14b", ind: "kamu adalah berbahagia. Sebab itu janganlah kamu takuti", eng: "And do not be afraid of their threats, nor be troubled" },
+        { id: "1 Pet 3:15a", ind: "Tetapi kuduskanlah Kristus di dalam hatimu sebagai Tuhan", eng: "But sanctify the Lord God in your hearts" },
+        { id: "1 Pet 3:15b", ind: "Dan siap sedialah pada segala waktu untuk memberi pertanggungjawaban", eng: "and always be ready to give a defense to everyone who asks you" },
+        { id: "1 Pet 3:15c", ind: "kepada tiap-tiap orang yang meminta pertanggungjawaban dari kamu", eng: "a reason for the hope that is in you, with meekness and fear" },
+        { id: "1 Pet 3:16a", ind: "dan dengan hati yang murni, mapun jika kamu difitnah", eng: "having a good conscience, that when they defame you as evildoers" },
+        { id: "1 Pet 3:16b", ind: "mereka yang memanasi hidupmu yang baik dalam Kristus akan menjadi malu", eng: "those who revile your good conduct in Christ may be ashamed" },
+        { id: "1 Pet 3:17", ind: "Sebab lebih baik menderita karena berbuat baik, jika itu dikehendaki Allah", eng: "For it is better, if it is the will of God, to suffer for doing good than for doing evil" },
+        { id: "1 Pet 3:18a", ind: "Sebab juga Kristus telah mati sekali untuk segala dosa kita", eng: "For Christ also suffered once for sins, the just for the unjust" },
+        { id: "1 Pet 3:18b", ind: "Ia, yang benar, untuk orang-orang yang tidak benar", eng: "that He might bring us to God, being put to death in the flesh" },
+        { id: "1 Pet 3:18c", ind: "supaya Ia membawa kita kepada Allah; Ia, yang telah dibunuh dalam keadaan-Nya", eng: "but made alive by the Spirit" },
+        { id: "1 Pet 3:19", ind: "dan di dalam Roh itu juga Ia pergi memberitakan Injil", eng: "by whom also He went and preached to the spirits in prison" },
+        { id: "1 Pet 3:20a", ind: "yaitu kepada roh-row yang dahulu pada waktu Nuh tidak taat", eng: "who formerly were disobedient, when once the Divine longsuffering waited" },
+        { id: "1 Pet 3:20b", ind: "ketika Allah menanti dengan sabar, waktu bahtera itu sedang dipersiapkan", eng: "in the days of Noah, while the ark was being prepared" },
+        { id: "1 Pet 3:21a", ind: "Juga kamu sekarang diselamatkan oleh kiasannya, yaitu baptisan", eng: "There is also an antitype which now saves us—baptism" },
+        { id: "1 Pet 3:21b", ind: "maksudnya bukan untuk membersihkan kenajisan jasmani", eng: "not the removal of the filth of the flesh" },
+        { id: "1 Pet 3:21c", ind: "melainkan mohon hati nurani yang baik kepada Allah oleh kebangkitan Yesus", eng: "but the answer of a good conscience toward God, through the resurrection of Jesus" },
+        { id: "1 Pet 3:22", ind: "yang duduk di sebelah kanan Allah, setelah Ia naik ke sorga", eng: "who has gone into heaven and is at the right hand of God, angels and authorities" },
+
+        // CHAPTER 4
+        { id: "1 Pet 4:1a", ind: "Jadi, karena Kristus telah menderita penderitaan badani", eng: "Therefore, since Christ suffered for us in the flesh" },
+        { id: "1 Pet 4:1b", ind: "kamupun harus mempersenjatai dirimu dengan pikiran yang demikian", eng: "arm yourselves also with the same mind" },
+        { id: "1 Pet 4:2", ind: "supaya waktu yang sisa di dalam dunia ini jangan kamu gunakan", eng: "that he no longer should live the rest of his time in the flesh for lusts" },
+        { id: "1 Pet 4:3a", ind: "Sebab telah cukup banyak waktu yang kamu pergunakan", eng: "For we have spent enough of our past lifetime" },
+        { id: "1 Pet 4:3b", ind: "untuk melakukan kehendak orang-orang yang tidak mengenal Allah", eng: "in doing the will of the Gentiles" },
+        { id: "1 Pet 4:4", ind: "Sebab itu mereka heran, bahwa kamu tidak turut berlari dengan mereka", eng: "In regard to these, they think it strange that you do not run with them" },
+        { id: "1 Pet 4:5", ind: "Tetapi mereka harus memberi pertanggungjawaban kepada Dia", eng: "They will give an account to Him who is ready to judge the living and the dead" },
+        { id: "1 Pet 4:6", ind: "Itulah sebabnya maka Injil telah diberitakan juga kepada orang-orang mati", eng: "For this reason the gospel was preached also to those who are dead" },
+        { id: "1 Pet 4:7", ind: "Kesudahan segala sesuatu sudah dekat. Karena itu kuasailah dirimu", eng: "But the end of all things is at hand; therefore be serious and watchful in your prayers" },
+        { id: "1 Pet 4:8", ind: "Tetapi yang terutama: kasihilah sungguh-sungguh seorang akan yang lain", eng: "And above all things have fervent love for one another, for love will cover a multitude of sins" },
+        { id: "1 Pet 4:9", ind: "Berilah tumpangan seorang kepada yang lain dengan tidak bersungut-sungut", eng: "Be hospitable to one another without grumbling" },
+        { id: "1 Pet 4:10", ind: "Layanilah seorang akan yang lain, sesuai dengan karunia", eng: "As each one has received a gift, minister it to one another" },
+        { id: "1 Pet 4:11a", ind: "Jika ada orang yang berbicara, hendaklah ia berbicara sebagai orang", eng: "If anyone speaks, let him speak as the oracles of God" },
+        { id: "1 Pet 4:11b", ind: "yang menyampaikan firman Allah; jika ada orang yang melayani", eng: "If anyone ministers, let him do it as with the ability which God supplies" },
+        { id: "1 Pet 4:12", ind: "Saudara-saudaraku yang kekasih, janganlah kamu heran akan nyala api", eng: "Beloved, do not think it strange concerning the fiery trial which is to try you" },
+        { id: "1 Pet 4:13", ind: "Sebaliknya, bersukacitalah, sesuai dengan bagian yang kamu dapat", eng: "but rejoice to the extent that you partake of Christ's sufferings" },
+        { id: "1 Pet 4:14", ind: "Berbahagialah kamu, jika kamu dinistakan karena nama Kristus", eng: "If you are reproached for the name of Christ, blessed are you" },
+        { id: "1 Pet 4:15", ind: "Janganlah ada di antara kamu yang harus menderita sebagai pembunuh", eng: "But let none of you suffer as a murderer, a thief, an evildoer" },
+        { id: "1 Pet 4:16", ind: "Tetapi, jika ia menderita sebagai orang Kristen, melainkan hendaklah ia", eng: "Yet if anyone suffers as a Christian, let him not be ashamed, but let him glorify God" },
+        { id: "1 Pet 4:17", ind: "Karena sekarang telah tibanya penghakiman dimulai dari rumah Allah", eng: "For the time has come for judgment to begin at the house of God" },
+        { id: "1 Pet 4:18", ind: "Dan jika orang benar hampir-hampir tidak diselamatkan", eng: "Now 'If the righteous one is scarcely saved, where will the ungodly appear?'" },
+        { id: "1 Pet 4:19", ind: "Karena itu nyerahkanlah jiwanya dengan berbuat baik kepada Pencipta", eng: "Therefore let those who suffer according to the will of God commit their souls to Him" },
+
+        // CHAPTER 5
+        { id: "1 Pet 5:1a", ind: "Aku menasihatkan para penatua di antara kamu", eng: "The elders who are among you I exhort" },
+        { id: "1 Pet 5:1b", ind: "aku sebagai teman penatua dan saksi penderitaan Kristus", eng: "I who am a fellow elder and a witness of the sufferings of Christ" },
+        { id: "1 Pet 5:2a", ind: "Gembalakanlah kawanan domba Allah yang ada padamu", eng: "Shepherd the flock of God which is among you" },
+        { id: "1 Pet 5:2b", ind: "jangan dengan paksa, tetapi dengan sukarela sesuai dengan kehendak Allah", eng: "serving as overseers, not by compulsion but willingly" },
+        { id: "1 Pet 5:3", ind: "Janganlah kamu berbuat seolah-olah kamu mau memerintah", eng: "nor as being lords over those entrusted to you, but being examples to the flock" },
+        { id: "1 Pet 5:4", ind: "Maka kamu, apabila Gembala Agung menyatakan diri-Nya", eng: "and when the Chief Shepherd appears, you will receive the crown of glory" },
+        { id: "1 Pet 5:5a", ind: "Demikian juga kamu, hai orang-orang muda, tunduklah kepada orang tua", eng: "Likewise you younger people, submit yourselves to your elders" },
+        { id: "1 Pet 5:5b", ind: "Dan kamu semua, ikatpinggangkanlah kerendahan hati", eng: "Yes, all of you be submissive to one another, and be clothed with humility" },
+        { id: "1 Pet 5:5c", ind: "karena: Allah menentang orang yang congkak, tetapi mengasihani yang rendah hati", eng: "for 'God resists the proud, but gives grace to the humble.'" },
+        { id: "1 Pet 5:6", ind: "Karena itu rendahkanlah dirimu di bawah tangan Tuhan yang kuat", eng: "Therefore humble yourselves under the mighty hand of God, that He may exalt you" },
+        { id: "1 Pet 5:7", ind: "Serahkanlah segala kekuatiranmu kepada-Nya, sebab Ia yang memelihara kamu", eng: "casting all your care upon Him, for He cares for you" },
+        { id: "1 Pet 5:8a", ind: "Sadarlah dan berjaga-jagalah! Lawanmu, si Iblis", eng: "Be sober, be vigilant; because your adversary the devil" },
+        { id: "1 Pet 5:8b", ind: "berjalan keliling sama seperti singa yang mengaum-ngaum", eng: "walks about like a roaring lion, seeking whom he may devour" },
+        { id: "1 Pet 5:9a", ind: "Lawanlah dia dengan iman yang teguh", eng: "Resist him, steadfast in the faith" },
+        { id: "1 Pet 5:9b", ind: "sebab kamu tahu, bahwa semua saudaramu di seluruh dunia", eng: "knowing that the same sufferings are experienced by your brotherhood" },
+        { id: "1 Pet 5:10a", ind: "Dan Allah, sumber segala kasih karunia, yang telah memanggil kamu", eng: "But may the God of all grace, who called us to His eternal glory" },
+        { id: "1 Pet 5:10b", ind: "akan melengkapi, meneguhkan, menguatkan dan mengokohkan kamu", eng: "after you have suffered a little while, perfect, establish, strengthen, and settle you" },
+        { id: "1 Pet 5:11", ind: "Ialah yang empunya kuasa sampai selama-lamanya! Amin", eng: "To Him be the glory and the dominion forever and ever. Amen." },
+        { id: "1 Pet 5:12", ind: "Dengan perantaraan Silwanus, aku menulis dengan singkat kepada kamu", eng: "By Silvanus, our faithful brother as I consider him, I have written to you briefly" },
+        { id: "1 Pet 5:13", ind: "Salam kepadamu dari banyaki yang terpilih bersama kamu di Babilon", eng: "She who is in Babylon, elect together with you, greets you; and so does Mark my son" },
+        { id: "1 Pet 5:14", ind: "Berilah salam seorang kepada yang lain dengan kecupan kasih", eng: "Greet one another with a kiss of love. Peace to you all who are in Christ Jesus. Amen." }
+    ];
+
+    let indonesianAnswer = "";
+    let englishPrompt = "";
+    let isTransitioning = false;
+    let peekTimeout = null;
+
+    // Populates the dropdown menu dynamically from the data array
+    function buildDropdown() {
+        const selector = document.getElementById("phraseSelector");
+        selector.innerHTML = ""; // Clear existing
+        
+        bibleData.forEach((item, index) => {
+            const opt = document.createElement("option");
+            opt.value = item.ind;
+            opt.setAttribute("data-english", item.eng);
+            
+            // Shorten the dropdown option label text so it fits beautifully on small screens
+            let shortEng = item.eng.length > 35 ? item.eng.substring(0, 35) + "..." : item.eng;
+            opt.text = `${item.id} - ${shortEng}`;
+            selector.appendChild(opt);
+        });
+    }
+
+    function updatePreview() {
+        const selector = document.getElementById("phraseSelector");
+        if(selector.options.length === 0) return;
+        const selectedOption = selector.options[selector.selectedIndex];
+        document.getElementById("previewBox").innerText = selectedOption.getAttribute("data-english");
+    }
+
+    function startPractice() {
+        isTransitioning = false;
+        clearTimeout(peekTimeout);
+        
+        const selector = document.getElementById("phraseSelector");
+        const selectedOption = selector.options[selector.selectedIndex];
+        
+        indonesianAnswer = selectedOption.value;
+        englishPrompt = selectedOption.getAttribute("data-english");
+        
+        const currentLabel = selectedOption.text.split(" - ")[0];
+        document.getElementById("phraseLabel").innerText = currentLabel;
+        
+        const targetBox = document.getElementById("targetPhrase");
+        targetBox.innerText = englishPrompt;
+        targetBox.style.borderLeftColor = "#2980b9"; 
+        
+        document.getElementById("userInput").value = "";
+        document.getElementById("userInput").disabled = false;
+        document.getElementById("userInput").style.borderColor = "#ccc";
+        document.getElementById("userInput").style.backgroundColor = "#fff";
+        document.getElementById("result").innerText = "";
+        
+        document.getElementById("screen1").classList.add("hidden");
+        document.getElementById("screen2").classList.remove("hidden");
+        
+        setTimeout(() => {
+            document.getElementById("userInput").focus();
+            playAudio();
+        }, 300);
+    }
+
+    function peekIndonesian() {
+        if (isTransitioning) return;
+        clearTimeout(peekTimeout);
+        
+        const targetBox = document.getElementById("targetPhrase");
+        targetBox.innerText = indonesianAnswer;
+        targetBox.style.borderLeftColor = "#e67e22"; 
+        
+        peekTimeout = setTimeout(() => {
+            targetBox.innerText = englishPrompt;
+            targetBox.style.borderLeftColor = "#2980b9";
+        }, 2000);
+    }
+
+    function playAudio() {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); 
+            let spokenText = indonesianAnswer.replace(/-/g, " ");
+            const utterance = new SpeechSynthesisUtterance(spokenText);
+            utterance.lang = 'id-ID'; 
+            utterance.rate = 0.85; 
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Your browser device does not support voice audio synthesis.");
+        }
+    }
+
+    function liveCheck() {
+        if (isTransitioning) return;
+
+        const targetClean = indonesianAnswer.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const inputClean = document.getElementById("userInput").value.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const resultBox = document.getElementById("result");
+
+        if (inputClean === targetClean && inputClean.length > 0) {
+            isTransitioning = true;
+            clearTimeout(peekTimeout); 
+            
+            document.getElementById("targetPhrase").innerText = englishPrompt;
+            document.getElementById("targetPhrase").style.borderLeftColor = "#2980b9";
+
+            resultBox.style.color = "green";
+            resultBox.innerText = "✓ Perfect Match! Loading next phrase...";
+            document.getElementById("userInput").style.borderColor = "#27ae60";
+            document.getElementById("userInput").style.backgroundColor = "#e8f8f5";
+            document.getElementById("userInput").disabled = true;
+
+            setTimeout(() => {
+                advanceToNext();
+            }, 1500);
+
+        } else if (targetClean.startsWith(inputClean) && inputClean.length > 0) {
+            resultBox.style.color = "#3498db";
+            resultBox.innerText = "Typing... (Spelling correct so far)";
+            document.getElementById("userInput").style.borderColor = "#ccc";
+            document.getElementById("userInput").style.backgroundColor = "#fff";
+        } else if (inputClean.length > 0) {
+            resultBox.style.color = "red";
+            resultBox.innerText = "✗ Typo detected! Match the spoken Indonesian text.";
+            document.getElementById("userInput").style.borderColor = "#e74c3c";
+        } else {
+            resultBox.innerText = "";
+        }
+    }
+
+    function advanceToNext() {
+        const selector = document.getElementById("phraseSelector");
+        let nextIndex = selector.selectedIndex + 1;
+
+        if (nextIndex >= selector.options.length) {
+            nextIndex = 0;
+        }
+
+        selector.selectedIndex = nextIndex;
+        updatePreview();
+        startPractice();
+    }
+
+    function skipPhrase() {
+        clearTimeout(peekTimeout);
+        advanceToNext();
+    }
+
+    function goBack() {
+        clearTimeout(peekTimeout);
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+        document.getElementById("screen2").classList.add("hidden");
+        document.getElementById("screen1").classList.remove("hidden");
+    }
+
+    window.onload = function() {
+        buildDropdown();
+        updatePreview();
+    };
+</script>
+
+</body>
+</html>
