@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tes Kosakata 1 Petrus Bab 1-5</title>
+    <!-- Stable Android/Mobile Audio Fallback Engine -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=7g9gZ8Ym"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 550px;
+            width: 100%;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        h1 { font-size: 22px; }
+        h2 { font-size: 20px; color: #2980b9; }
+        
+        .verse-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #2980b9;
+            padding: 15px;
+            text-align: left;
+            margin: 15px 0;
+            border-radius: 4px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        .verse-id { font-weight: bold; color: #2c3e50; margin-bottom: 5px; font-size: 15px; line-height: 1.5; }
+        .verse-en { font-style: italic; color: #7f8c8d; margin-top: 5px; font-size: 13px; line-height: 1.5; }
+
+        .word-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2980b9;
+            margin: 15px 0;
+            min-height: 40px;
+        }
+        .letter-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .letter-input {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: lowercase;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            outline: none;
+            transition: all 0.1s;
+        }
+        .letter-input:focus {
+            border-color: #2980b9;
+            box-shadow: 0 0 5px rgba(41, 128, 185, 0.3);
+        }
+        .correct-letter {
+            color: #27ae60 !important;
+            border-color: #27ae60 !important;
+            background-color: #e8f8f5 !important;
+        }
+        .wrong-letter {
+            color: #c0392b !important;
+            border-color: #c0392b !important;
+            background-color: #fdebd0 !important;
+        }
+        button {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 85%;
+            transition: background 0.2s;
+            font-weight: bold;
+            touch-action: manipulation;
+        }
+        button:hover {
+            background-color: #1f6391;
+        }
+        .audio-btn {
+            background-color: #2ecc71;
+            margin-bottom: 10px;
+            width: 85%;
+        }
+        .audio-btn:hover {
+            background-color: #27ae60;
+        }
+        .quiz-audio-btn {
+            background-color: #2ecc71;
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+            margin-bottom: 15px;
+        }
+        .quiz-audio-btn:hover {
+            background-color: #27ae60;
+        }
+        .word-audio-btn {
+            background-color: #1abc9c;
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+            margin-bottom: 15px;
+        }
+        .word-audio-btn:hover {
+            background-color: #16a085;
+        }
+        .translate-btn {
+            background-color: #9b59b6;
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+            margin-bottom: 15px;
+        }
+        .translate-btn:hover {
+            background-color: #8e44ad;
+        }
+        .hint-btn {
+            background-color: #e67e22;
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+            margin-bottom: 15px;
+        }
+        .hint-btn:hover {
+            background-color: #d35400;
+        }
+        .feedback {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        .correct-text { color: #27ae60; }
+        .wrong-text { color: #c0392b; }
+        .score {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #2c3e50;
+            background: #ecf0f1;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .screen { display: none; }
+        .active-screen { display: block; }
+        
+        .setup-select {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+            text-align: center;
+            margin: 5px 0;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+        }
+        .selector-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- SCREEN 1: Overview & Verse Selection -->
+    <div id="verse-screen" class="screen active-screen">
+        <h1>Pilih Ayat 1 Petrus</h1>
+        
+        <div class="selector-group">
+            <div>
+                <label style="font-weight: bold; color: #34495e;">Bab:</label><br>
+                <select id="chapter-select" class="setup-select" style="width: 100px;" onchange="handleChapterChange()">
+                    <option value="1">Bab 1</option>
+                    <option value="2">Bab 2</option>
+                    <option value="3">Bab 3</option>
+                    <option value="4">Bab 4</option>
+                    <option value="5">Bab 5</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold; color: #34495e;">Ayat:</label><br>
+                <select id="verse-select" class="setup-select" style="width: 120px;" onchange="updateOverviewDisplay()">
+                    <!-- Populated dynamically via JS -->
+                </select>
+            </div>
+        </div>
+
+        <div class="verse-box">
+            <div class="verse-id" id="overview-id">...</div>
+            <div id="overview-en" class="verse-en">...</div>
+        </div>
+
+        <button id="speak-btn" class="audio-btn" onclick="speakVerseText()">🔊 Dengarkan Ayat (Speak)</button>
+        <button id="start-test-btn" onclick="startQuizForSelectedVerse()">Mulai Tes Ayat Ini</button>
+    </div>
+
+    <!-- SCREEN 2: Quiz Engine -->
+    <div id="quiz-screen" class="screen">
+        <h2 id="quiz-verse-heading">...</h2>
+        <div style="font-size: 14px; color: #95a5a6; font-weight: bold;" id="question-number-display">Kata #1</div>
+        <div class="word-display" id="english-word">...</div>
+        
+        <div class="letter-container" id="letter-boxes-container"></div>
+        
+        <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+            <button class="quiz-audio-btn" onclick="speakVerseText()">🔊 Dengar Ayat</button>
+            <button class="word-audio-btn" onclick="speakCurrentWord()">🔊 Dengar Kata</button>
+            <button class="translate-btn" onclick="lookupTranslation()">🔍 Arti (English)</button>
+            <button id="hint-btn" class="hint-btn" onclick="triggerFlashHint()">Bantuan (Hint)</button>
+        </div>
+        
+        <button id="submit-btn" onclick="handleButtonClick()">Selesai & Periksa</button>
+        
+        <div class="feedback" id="feedback"></div>
+        <div class="score" id="score-box">Skor Ayat Ini: <span id="score-val">0</span> / <span id="total-val">0</span></div>
+    </div>
+</div>
+
+<script>
+    const fullBibleData = {
+        1: [
+            { v: 1, id: "Dari Petrus, rasul Yesus Kristus, kepada orang-orang pendatang, yang tersebar di Pontus, Galatia, Kapadokia, Asia Kecil dan Bitinia,", en: "Peter, an apostle of Jesus Christ, To the pilgrims of the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia," },
+            { v: 2, id: "yaitu orang-orang yang dipilih, sesuai dengan rencana Allah, Bapa kita, dan yang dikuduskan oleh Roh, supaya taat kepada Yesus Kristus dan menerima percikan darah-Nya. Kiranya kasih karunia dan damai sejahtera makin melimpah atas kamu.", en: "elect according to the foreknowledge of God the Father, in sanctification of the Spirit, for obedience and sprinkling of the blood of Jesus Christ: Grace to you and peace be multiplied." },
+            { v: 3, id: "Terpujilah Allah dan Bapa Tuhan kita Yesus Kristus, yang karena rahmat-Nya yang besar telah melahirkan kita kembali oleh kebangkitan Yesus Kristus dari antara orang mati, kepada suatu hidup yang penuh pengharapan,", en: "Blessed be the God and Father of our Lord Jesus Christ, who according to His abundant mercy has begotten us again to a living hope through the resurrection of Jesus Christ from the dead," },
+            { v: 4, id: "untuk menerima suatu bagian yang tidak dapat binasa, yang tidak dapat cemar dan yang tidak dapat layu, yang tersimpan di sorga bagi kamu.", en: "to an inheritance incorruptible and undefiled and that does not fade away, reserved in heaven for you," },
+            { v: 5, id: "Yaitu kamu, yang dengan kuasa Allah terpelihara dari sebab iman menuju kepada keselamatan yang sedia akan dinyatakan pada akhir zaman.", en: "who are kept by the power of God through faith for a salvation ready to be revealed in the last time." },
+            { v: 6, id: "Di dalam hal ini kamu bersukacita, walaupun sementara sedikit masa, jikalau wajib, kamu menanggung duka cita di dalam berbagai-bagai pencobaan.", en: "In this you greatly rejoice, though now for a little while, if need be, you have been grieved by various trials," },
+            { v: 7, id: "Maksud semuanya itu ialah untuk membuktikan kemurnian imanmu -- yang jauh lebih tinggi nilainya dari pada emas yang fana, yang diuji kemurniannya dengan api -- sehingga kamu memperoleh puji-pujian dan kemuliaan dan kehormatan pada hari Yesus Kristus menyatakan diri-Nya.", en: "that the genuineness of your faith, being much more precious than gold that perishes, though it is tested by fire, may be found to praise, honor, and glory at the revelation of Jesus Christ," },
+            { v: 8, id: "Sekalipun kamu belum pernah melihat Dia, namun kamu mengasihi-Nya. Kamu percaya kepada Dia, sekalipun kamu sekarang tidak melihat-Nya. Kamu bergembira karena sukacita yang mulia dan yang tidak terkatakan,", en: "whom having not seen you love. Though now you do not see Him, yet believing, you rejoice with joy inexpressible and full of glory," },
+            { v: 9, id: "karena kamu telah mencapai tujuan imanmu, yaitu keselamatan jiwamu.", en: "receiving the end of your faith--the salvation of your souls." },
+            { v: 10, id: "Keselamatan itulah yang diselidiki dan diteliti oleh nabi-nabi, yang telah bernubuat tentang kasih karunia yang diuntukkan bagimu.", en: "Of this salvation the prophets have inquired and searched carefully, who prophesied of the grace that would come to you," },
+            { v: 11, id: "Dan mereka meneliti saat yang mana dan yang bagaimana yang dimaksudkan oleh Roh Kristus, yang ada di dalam mereka, yaitu Roh yang sebelumnya memberi kesaksian tentang segala penderitaan yang akan menimpa Kristus dan tentang segala kemuliaan yang menyusul kemudian.", en: "searching what, or what manner of time, the Spirit of Christ who was in them was indicating when He testified beforehand the sufferings of Christ and the glories that would follow." },
+            { v: 12, id: "Kepada mereka telah dinyatakan, bahwa mereka bukan melayani diri mereka sendiri, tetapi melayani kamu dengan segala sesuatu yang sekarang diberitakan kepada kamu oleh mereka, yang oleh Roh Kudus, yang diutus dari sorga, menyampaikan berita Injil kepada kamu, yaitu hal-hal yang ingin diketahui oleh malaikat-malaikat.", en: "To them it was revealed that, not to themselves, but to us they were ministering the things which now have been reported to you through those who have preached the gospel to you by the Holy Spirit sent from heaven--things which angels desire to look into." },
+            { v: 13, id: "Sebab itu siapkanlah akal budimu, waspadalah dan letakkanlah pengharapanmu seluruhnya atas kasih karunia yang dianugerahkan kepadamu pada waktu penyataan Yesus Kristus.", en: "Therefore gird up the loins of your mind, be sober, and rest your hope fully upon the grace that is to be brought to you at the revelation of Jesus Christ;" },
+            { v: 14, id: "Hiduplah sebagai anak-anak yang taat dan jangan turuti hawa nafsu yang menguasai kamu pada waktu kebodohanmu,", en: "as obedient children, not conforming yourselves to the former lusts, as in your ignorance;" },
+            { v: 15, id: "tetapi hendaklah kamu menjadi kudus di dalam seluruh hidupmu sama seperti Dia yang kudus, yang telah memanggil kamu,", en: "but as He who called you is holy, you also be holy in all your conduct," },
+            { v: 16, id: "sebab ada tertulis: Kuduslah kamu, sebab Aku kudus.", en: "because it is written, 'Be holy, for I am holy.'" },
+            { v: 17, id: "Dan jikalau kamu menyebut-Nya Bapa, yaitu Dia yang menghakimi semua orang menurut perbuatannya dengan tidak memandang muka, maka hendaklah kamu hidup dalam ketakutan selama waktu penumpanganmu di dunia ini.", en: "And if you call on the Father, who without partiality judges according to each one's work, conduct yourselves throughout the time of your stay here in fear;" },
+            { v: 18, id: "Sebab kamu tahu, bahwa kamu telah ditebus dari cara hidupmu yang sia-sia yang kamu warisi dari nenek moyangmu itu bukan dengan barang yang fana, bukan pula dengan perak atau emas,", en: "knowing that you were not redeemed with corruptible things, like silver or gold, from your aimless conduct received by tradition from your fathers," },
+            { v: 19, id: "melainkan dengan darah yang mahal, yaitu darah Kristus yang sama seperti darah anak domba yang tak bernoda dan tak bercacat.", en: "but with the precious blood of Christ, as of a lamb without blemish and without spot." },
+            { v: 20, id: "Ia telah dipilih sebelum dunia dijadikan, tetapi karena kamu baru menyatakan diri-Nya pada zaman akhir.", en: "He indeed was foreordained before the foundation of the world, but was manifest in these last times for you" },
+            { v: 21, id: "Oleh Dialah kamu percaya kepada Allah, yang telah membangkitkan Dia dari antara orang mati dan yang telah memuliakan-Nya, sehingga imanmu dan pengharapanmu tertuju kepada Allah.", en: "who through Him believe in God, who raised Him from the dead and gave Him glory, so that your faith and hope are in God." },
+            { v: 22, id: "Karena kamu telah menyucikan dirimu oleh ketaatan kepada kebenaran, sehingga kamu dapat mengamalkan kasih persaudaraan yang tulus ikhlas, hendaklah kamu bersungguh-sungguh dan dengan segenap hatimu saling mengasihi.", en: "Since you have purified your souls in obeying the truth through the Spirit in sincere love of the brethren, love one another fervently with a pure heart," },
+            { v: 23, id: "Karena kamu telah dilahirkan kembali bukan dari benih yang fana, tetapi dari benih yang tidak fana, oleh firman Allah, yang hidup dan yang kekal.", en: "having been born again, not of corruptible seed but incorruptible, through the word of God which lives and abides forever," },
+            { v: 24, id: "Sebab: Semua yang hidup adalah seperti rumput dan segala kemuliaannya seperti bunga rumput, rumput menjadi kering, dan bunga gugur,", en: "because 'All flesh is as grass, And all the glory of man as the flower of grass. The grass withers, And its flower falls away," },
+            { v: 25, id: "tetapi firman Tuhan tetap untuk selama-lamanya. Inilah firman yang disampaikan Injil kepada kamu.", en: "But the word of the LORD endures forever.' Now this is the word which by the gospel was preached to you." }
+        ],
+        2: [
+            { v: 1, id: "Karena itu buanglah segala kejahatan, segala tipu muslihat dan segala macam kemunafikan, kedengkian dan fitnah.", en: "Therefore, laying aside all malice, all deceit, hypocrisy, envy, and all evil speaking," },
+            { v: 2, id: "Dan jadilah sama seperti bayi yang baru lahir, yang selalu ingin akan air susu yang murni dan yang rohani, supaya olehnya kamu tumbuh dan beroleh keselamatan,", en: "as newborn babes, desire the pure milk of the word, that you may grow thereby," },
+            { v: 3, id: "jika kamu benar-benar telah mengecap kebaikan Tuhan.", en: "if indeed you have tasted that the Lord is gracious." },
+            { v: 4, id: "Dan datanglah kepada-Nya, batu yang hidup itu, yang memang dibuang oleh manusia, tetapi yang dipilih dan terhormat di hadapan Allah.", en: "Coming to Him as to a living stone, rejected indeed by men, but chosen by God and precious," },
+            { v: 5, id: "Dan biarlah diri kamu juga dipergunakan sebagai batu hidup untuk pembangunan suatu rumah rohani, bagi suatu imamatan kudus, untuk mempersembahkan korban rohani yang karena Yesus Krestus berkenan kepada Allah.", en: "you also, as living stones, are being built up a spiritual house, a holy priesthood, to offer up spiritual sacrifices acceptable to God through Jesus Christ." },
+            { v: 6, id: "Sebab ada tertulis dalam Kitab Suci: Sesungguhnya, Aku meletakkan di Sion sebuah batu pilihan, sebuah batu penjuru yang mahal, dan siapa yang percaya kepada-Nya, tidak akan dipermalukan.", en: "Therefore it is also contained in the Scripture, 'Behold, I lay in Zion A chief cornerstone, elect, precious, And he who believes on Him will by no means be put to shame.'" },
+            { v: 7, id: "Karena itu bagi kamu, yang percaya, ia mahal, tetapi bagi mereka yang tidak percaya: Batu yang telah dibuang oleh tukang-tukang bangunan, telah menjadi batu penjuru, juga telah menjadi batu sandungan dan suatu batu sentuhan.", en: "Therefore, to you who believe, He is precious; but to those who are disobedient, 'The stone which the builders rejected Has become the chief cornerstone,' and 'A stone of stumbling And a rock of offense.'" },
+            { v: 8, id: "Mereka tersandung padanya, karena mereka tidak taat kepada Firman Allah; dan untuk itu mereka juga telah ditentukan.", en: "They stumble, being disobedient to the word, to which they also were appointed." },
+            { v: 9, id: "Tetapi kamulah bangsa yang terpilih, imamatan yang rajani, bangsa yang kudus, umat kepunyaan Allah sendiri, supaya kamu memberitakan perbuatan-perbuatan yang besar dari Dia, yang telah memanggil kamu keluar dari kegelapan kepada terang-Nya yang ajaib:", en: "But you are a chosen generation, a royal priesthood, a holy nation, His own special people, that you may proclaim the praises of Him who called you out of darkness into His marvelous light;" },
+            { v: 10, id: "kamu, yang dahulu bukan umat Allah, tetapi yang sekarang telah menjadi umat-Nya, yang dahulu tidak dikasihi tetapi yang sekarang beroleh rahmat.", en: "who once were not a people but are now the people of God, who had not obtained mercy but now have obtained mercy." },
+            { v: 11, id: "Saudara-saudaraku yang kekasih, aku menasihati kamu, supaya sebagai pendatang dan perantau, kamu menjauhkan diri dari keinginan-keinginan daging yang berjuang melawan jiwa.", en: "Beloved, I beg you as sojourners and pilgrims, abstain from fleshly lusts which war against the soul," },
+            { v: 12, id: "Milikilah cara hidup yang baik di tengah-tengah bangsa-bangsa bukan Yahudi, supaya apabila mereka memfitnah kamu sebagai orang durjana, mereka dapat melihatnya dari perbuatan-perbuatanmu yang baik dan memuliakan Allah pada hari Ia melawat mereka.", en: "having your conduct honorable among the Gentiles, that when they speak against you as evildoers, they may, by your good works which they observe, glorify God in the day of visitation." },
+            { v: 13, id: "Tunduklah, karena Tuhan, kepada semua lembaga manusia, baik kepada raja sebagai pemegang kekuasaan yang tertinggi,", en: "Therefore submit yourselves to every ordinance of man for the Lord's sake, whether to the king as supreme," },
+            { v: 14, id: "baik kepada gubernur-gubernur sebagai orang-orang yang diutusnya untuk menghukum orang-orang yang berbuat jahat dan menghormati orang-orang yang berbuat baik.", en: "or to governors, as to those who are sent by him for the punishment of evildoers and for the praise of those who do good." },
+            { v: 15, id: "Sebab inilah kehendak Allah, yaitu supaya dengan berbuat baik kamu membungkamkan kepicikan orang-orang yang bodoh.", en: "For this is the intention of God, that by doing good you may put to silence the ignorance of foolish men--" },
+            { v: 16, id: "Hiduplah sebagai orang merdeka dan bukan seperti mereka yang menyalahgunakan kemerdekaan itu untuk menyelubungi kejahatan mereka, tetapi hiduplah sebagai hamba Allah.", en: "as free, yet not using liberty as a cloak for vice, but as bondservants of God." },
+            { v: 17, id: "Hormatilah semua orang, kasihilah saudara-saudara, takutlah akan Allah, hormatilah raja!", en: "Honor all people. Love the brotherhood. Fear God. Honor the king." },
+            { v: 18, id: "Hai kamu, hamba-hamba, tunduklah dengan penuh ketakutan kepada tuanmu, bukan saja kepada yang baik dan peramah, tetapi juga kepada yang bengis.", en: "Servants, be submissive to your masters with all fear, not only to the good and gentle, but also to the harsh." },
+            { v: 19, id: "Sebab adalah kasih karunia, jika seorang karena kesadaran akan kehendak Allah menanggung penderitaan yang tidak harus ia tanggung.", en: "For this is commendable, if because of conscience toward God one endures grief, suffering wrongfully." },
+            { v: 20, id: "Sebab dapatkah disebut pujian, jika kamu menderita pukulan karena kamu berbuat dosa? Tetapi jika kamu berbuat baik dan karena itu kamu menderita penderitaan, maka itu adalah kasih karunia di hadapan Allah.", en: "For what credit is it if, when you are beaten for your faults, you take it patiently? But when you do good and suffer, if you take it patiently, this is commendable before God." },
+            { v: 21, id: "Sebab untuk itulah kamu dipanggil, karena Kristus pun telah menderita untuk kamu dan telah meninggalkan teladan bagimu, supaya kamu mengikuti jejak-Nya.", en: "For to this you were called, because Christ also suffered for us, leaving us an example, that you should follow His steps:" },
+            { v: 22, id: "Ia tidak berbuat dosa, dan tipu tidak ada dalam mulut-Nya.", en: "'Who committed no sin, Nor was deceit found in His mouth';" },
+            { v: 23, id: "Ketika Ia dicaci maki, Ia tidak membalas dengan mencaci maki; ketika Ia menderita, Ia tidak mengancam, tetapi Ia menyerahkannya kepada Dia, yang menghakimi dengan adil.", en: "who, when He was reviled, did not revile in return; when He suffered, He did not threaten, but committed Himself to Him who judges righteously;" },
+            { v: 24, id: "Ia sendiri telah memikul dosa kita di dalam tubuh-Nya di kayu salib, supaya kita, yang telah mati terhadap dosa, hidup untuk kebenaran. Oleh bilur-bilur-Nya kamu telah sembuh.", en: "who Himself bore our sins in His own body on the tree, that we, having died to sins, might live for righteousness--by whose stripes you were healed." },
+            { v: 25, id: "Sebab kamu dahulu sesat seperti domba, tetapi sekarang kamu telah kembali kepada gembala dan pemelihara jiwamu.", en: "For you were like sheep going astray, but have now returned to the Shepherd and Overseer of your souls." }
+        ],
+        3: [
+            { v: 1, id: "Demikian juga kamu, hai isteri-isteri, tunduklah kepada suamimu, supaya jika ada di antara mereka yang tidak taat kepada Firman, mereka juga tanpa perkataan dimenangkan oleh kelakuan isterinya,", en: "Wives, likewise, be submissive to your own husbands, that even if some do not obey the word, they, without a word, may be won by the conduct of their wives," },
+            { v: 2, id: "jika mereka melihat, bagaimana murni dan salehnya hidupmu.", en: "when they observe your chaste conduct accompanied by fear." },
+            { v: 3, id: "Perhiasanmu janganlah secara lahiriah, yaitu dengan memilin-milin rambut, memakai perhiasan emas atau dengan mengenakan pakaian yang indah-indah,", en: "Do not let your adornment be merely outward--arranging the hair, wearing gold, or putting on fine apparel--" },
+            { v: 4, id: "tetapi perhiasanmu ialah manusia batiniah yang tersembunyi dengan perhiasan yang tidak layu yang berasal dari roh yang lemah lembut dan tenteram, yang sangat berharga di hadapan Allah.", en: "rather let it be the hidden person of the heart, with the incorruptible beauty of a gentle and quiet spirit, which is very precious in the sight of God." },
+            { v: 5, id: "Sebab demikianlah caranya perempuan-perempuan kudus dahulu berdandan, yaitu perempuan-perempuan yang menaruh pengharapan mereka kepada Allah; mereka tunduk kepada suami mereka,", en: "For in this manner, in former times, the holy wives who trusted in God also adorned themselves, being submissive to their own husbands," },
+            { v: 6, id: "sama seperti Sara taat kepada Abraham dan menyebut dia tuannya. Dan kamu adalah anak-anaknya, jika kamu berbuat baik dan tidak takut terhadap ancaman apa pun.", en: "as Sarah obeyed Abraham, calling him lord, whose daughters you are if you do good and are not afraid with any terror." },
+            { v: 7, id: "Demikian juga kamu, hai suami-suami, hiduplah bijaksana dengan isterimu, sebagai kaum yang lebih lemah! Hormatilah mereka sebagai teman pewaris dari kasih karunia, yaitu kehidupan, supaya doamu jangan terhalang.", en: "Husbands, likewise, dwell with them with understanding, giving honor to the wife, as to the weaker vessel, and as being heirs together of the grace of life, that your prayers may not be hindered." },
+            { v: 8, id: "Dan akhirnya, hendaklah kamu semua seia sekata, seperasaan, mengasihi saudara-saudara, penyayang dan rendah hati,", en: "Finally, all of you be of one mind, having compassion for one another; love as brothers, be tender-hearted, be courteous;" },
+            { v: 9, id: "dan janganlah membalas kejahatan dengan kejahatan, atau caci maki dengan caci maki, tetapi sebaliknya, hendaklah kamu memberkati, karena untuk itulah kamu dipanggil, yaitu untuk memperoleh berkat.", en: "not returning evil for evil or reviling for reviling, but on the contrary blessing, knowing that you were called to this, that you may inherit a blessing." },
+            { v: 10, id: "Sebab: Siapa yang mau mencintai hidup dan mau melihat hari-hari baik, ia harus menjaga lidahnya terhadap yang jahat dan bibirnya terhadap ucapan-ucapan yang menipu.", en: "For 'He who would love life And see good days, Let him refrain his tongue from evil, And his lips from speaking deceit.'" },
+            { v: 11, id: "Ia harus menjauhi yang jahat dan melakukan yang baik, ia harus mencari perdamaian dan mengejarnya.", en: "Let him turn away from evil and do good; Let him seek peace and pursue it." },
+            { v: 12, id: "Sebab mata Tuhan tertuju kepada orang-orang benar, dan telinga-Nya kepada permohonan mereka yang minta tolong, tetapi wajah Tuhan menentang orang-orang yang berbuat jahat.", en: "For the eyes of the LORD are on the righteous, And His ears are open to their prayers; But the face of the LORD is against those who do evil." },
+            { v: 13, id: "Dan siapakah yang akan berbuat jahat terhadap kamu, jika kamu rajin berbuat baik?", en: "And who is he who will harm you if you become followers of what is good?" },
+            { v: 14, id: "Tetapi sekalipun kamu harus menderita karena kebenaran, kamu akan berbahagia. Sebab itu janganlah kamu takuti apa yang mereka takuti dan janganlah gentar.", en: "But even if you should suffer for righteousness' sake, you are blessed. 'And do not be afraid of their threats, nor be troubled.'" },
+            { v: 15, id: "Tetapi kuduskanlah Kristus di dalam hatimu sebagai Tuhan! Dan siap sedialah pada segala waktu untuk memberi pertanggungjawaban kepada tiap-tiap orang yang meminta pertanggungjawaban dari kamu tentang pengharapan yang ada padamu, tetapi haruslah dengan lemah lembut dan hormat,", en: "But sanctify the Lord God in your hearts, and always be ready to give a defense to everyone who asks you a reason for the hope that is in you, with meekness and fear;" },
+            { v: 16, id: "dan dengan hati nurani yang murni, supaya mereka, yang memfitnah kamu karena hidupmu yang saleh dalam Kristus, menjadi malu karena fitnahan mereka itu.", en: "having a good conscience, that when they defame you as evildoers, those who revile your good conduct in Christ may be ashamed." },
+            { v: 17, id: "Sebab lebih baik menderita karena berbuat baik, jika itu dikehendaki Allah, dari pada menderita karena berbuat jahat.", en: "For it is better, if it is the will of God, to suffer for doing good than for doing evil." },
+            { v: 18, id: "Sebab juga Kristus telah menderita satu kali untuk segala dosa kita, Ia yang benar untuk orang-orang yang tidak benar, supaya Ia membawa kita kepada Allah; Ia, yang telah dibunuh dalam keadaan-Nya sebagai manusia, tetapi yang telah dibangkitkan oleh Roh,", en: "For Christ also suffered once for sins, the just for the unjust, that He might bring us to God, being put to death in the flesh but made alive by the Spirit," },
+            { v: 19, id: "dan di dalam Roh itu juga Ia pergi memberitakan Injil kepada roh-roh yang di dalam penjara,", en: "by whom also He went and preached to the spirits in prison," },
+            { v: 20, id: "yaitu roh-roh mereka yang dahulu pada waktu Nuh tidak taat kepada Allah, ketika Allah menanti dengan sabar waktu Nuh sedang mempersiapkan bahteranya, di mana hanya sedikit, yaitu delapan orang, yang diselamatkan oleh air bah itu.", en: "who formerly were disobedient, when once the Divine longsuffering waited in the days of Noah, while the ark was being prepared, in which a few, that is, eight souls, were saved through water." },
+            { v: 21, id: "Juga kamu sekarang diselamatkan oleh kiasannya, yaitu baptisan -- maksudnya bukan untuk membersihkan kenajisan jasmani, melainkan untuk memohon hati nurani yang baik kepada Allah -- oleh kebangkitan Yesus Kristus,", en: "There is also an antitype which now saves us--baptism (not the removal of the filth of the flesh, but the answer of a good conscience toward God), through the resurrection of Jesus Christ," },
+            { v: 22, id: "yang duduk di sebelah kanan Allah, setelah Ia naik ke sorga, sesudah segala malaikat, kuasa dan kekuatan ditundukkan kepada-Nya.", en: "who has gone into heaven and is at the right hand of God, angels and authorities and powers having been made subject to Him." }
+        ],
+        4: [
+            { v: 1, id: "Jadi, karena Kristus telah menderita sengsara dalam keadaan-Nya sebagai manusia, kamu pun harus mempersenjatai dirimu dengan pikiran yang demikian, -- karena barangsiapa telah menderita sengsara dalam keadaan-nya sebagai manusia, ia telah berhenti berbuat dosa --", en: "Therefore, since Christ suffered for us in the flesh, arm yourselves also with the same mind, for he who has suffered in the flesh has ceased from sin," },
+            { v: 2, id: "supaya waktu yang sisa di dalam dunia ini jangan kamu gunakan menurut keinginan manusia, tetapi menurut kehendak Allah.", en: "that he no longer should live the rest of his time in the flesh for the lusts of men, but for the will of God." },
+            { v: 3, id: "Sebab telah cukup banyak waktu yang kamu pergunakan untuk melakukan kehendak orang-orang yang tidak mengenal Allah. Kamu telah hidup dalam rupa-rupa hawa nafsu, keinginan, kemabukan, pesta pora, perjamuan minum dan penyembahan berhala yang terlarang.", en: "For we have spent enough of our past lifetime in doing the will of the Gentiles--when we walked in lewdness, lusts, drunkenness, revelries, drinking parties, and abominable idolatries." },
+            { v: 4, id: "Sebab itu mereka heran, bahwa kamu tidak turut berlari bersama-sama mereka ke dalam kubangan ketertiban yang sama, dan mereka memfitnah kamu.", en: "In regard to these, they think it strange that you do not run with them in the same flood of dissipation, speaking evil of you." },
+            { v: 5, id: "Tetapi mereka harus memberi pertanggungjawaban kepada Dia, yang siap sedia menghakimi orang yang hidup dan yang mati.", en: "They will give an account to Him who is ready to judge the living and the dead." },
+            { v: 6, id: "Itulah sebabnya maka Injil telah diberitakan juga kepada orang-orang mati, supaya mereka, sama seperti semua manusia, dihakimi secara badani, tetapi oleh Roh dapat hidup menurut kehendak Allah.", en: "For this reason the gospel was preached also to those who are dead, that they might be judged according to men in the flesh, but live according to God in the spirit." },
+            { v: 7, id: "Kesudahan segala sesuatu sudah dekat. Karena itu kuasailah dirimu dan jadilah tenang, supaya kamu dapat berdoa.", en: "But the end of all things is at hand; therefore be serious and watchful in your prayers." },
+            { v: 8, id: "Tetapi yang terutama: kasihilah sungguh-sungguh seorang akan yang lain, sebab kasih menutupi banyak sekali dosa.", en: "And above all things have fervent love for one another, for 'love will cover a multitude of sins.'" },
+            { v: 9, id: "Berilah tumpangan seorang kepada yang lain dengan tidak bersungut-sungut.", en: "Be hospitable to one another without grumbling." },
+            { v: 10, id: "Layanilah seorang akan yang lain, sesuai dengan karunia yang telah diperoleh tiap-tiap orang sebagai pengurus yang baik dari kasih karunia Allah.", en: "As each one has received a gift, minister it to one another, as good stewards of the manifold grace of God." },
+            { v: 11, id: "Jika ada orang yang berbicara, baiklah ia berbicara sebagai orang yang menyampaikan firman Allah; jika ada orang yang melayani, baiklah ia melayani dengan kekuatan yang dianugerahkan Allah, supaya Allah dimuliakan dalam segala sesuatu karena Yesus Kristus. Ialah yang empunya kemuliaan dan kuasa sampai selama-lamanya! Amin.", en: "If anyone speaks, let him speak as the oracles of God. If anyone ministers, let him do it as with the ability which God supplies, that in all things God may be glorified through Jesus Christ, to whom belong the glory and the dominion forever and ever. Amen." },
+            { v: 12, id: "Saudara-saudara yang kekasih, janganlah kamu heran akan nyala api siksaan yang datang kepadamu sebagai ujian, seolah-olah ada sesuatu yang luar biasa terjadi atas kamu.", en: "Beloved, do not think it strange concerning the fiery trial which is to try you, as though some strange thing happened to you;" },
+            { v: 13, id: "Sebaliknya, bersukacitalah, sesuai dengan bagian yang kamu dapat dalam penderitaan Kristus, supaya kamu juga boleh bergembira dan bersukacita pada waktu Ia menyatakan kemuliaan-Nya.", en: "but rejoice to the extent that you partake of Christ's sufferings, that when His glory is revealed, you may also be glad with exceeding joy." },
+            { v: 14, id: "Berbahagialah kamu, jika kamu dicela karena nama Kristus, sebab Roh kemuliaan, yaitu Roh Allah ada pada kamu.", en: "If you are reproached for the name of Christ, blessed are you, for the Spirit of glory and of God rests upon you. On their part He is blasphemed, but on your part He is glorified." },
+            { v: 15, id: "Janganlah ada di antara kamu yang harus menderita sebagai pembunuh atau pencuri atau penjahat, atau pengacau.", en: "But let none of you suffer as a murderer, a thief, an evildoer, or as a busybody in other people's matters." },
+            { v: 16, id: "Tetapi, jika ia menderita sebagai orang Kristen, maka janganlah ia malu, melainkan hendaklah ia memuliakan Allah dalam nama Kristus itu.", en: "Yet if anyone suffers as a Christian, let him not be ashamed, but let him glorify God in this matter." },
+            { v: 17, id: "Karena sekarang telah tibanya waktu penghakiman dimulai, dan pada rumah Allah sendiri yang harus terdahulu menyadarinya. Dan jika penghakiman itu dimulai pada kita, bagaimanakah kesudahannya dengan mereka yang tidak menaati Injil Allah?", en: "For the time has come for judgment to begin at the house of God; and if it begins with us first, what will be the end of those who do not obey the gospel of God?" },
+            { v: 18, id: "Dan jika orang benar hampir-hampir tidak diselamatkan, apakah yang akan terjadi dengan orang fasik dan orang berdosa?", en: "'Now if the righteous one is scarcely saved, Where will the ungodly and the sinner appear?'" },
+            { v: 19, id: "Karena itu orang-orang yang menderita karena kehendak Allah, hendaklah mempercayakan jiwanya kepada Pencipta yang setia, sambil terus berbuat baik.", en: "Therefore let those who suffer according to the will of God commit their souls to Him in doing good, as to a faithful Creator." }
+        ],
+        5: [
+            { v: 1, id: "Aku menasihatkan para penatua di antara kamu, aku sebagai teman penatua dan saksi penderitaan Kristus, yang juga akan mendapat bagian dalam kemuliaan yang akan dinyatakan kelak.", en: "The elders who are among you I exhort, I who am a fellow elder and a witness of the sufferings of Christ, and also a partaker of the glory that will be revealed:" },
+            { v: 2, id: "Gembalakanlah kawanan domba Allah yang ada padamu, jangan dengan paksa, tetapi dengan sukarela sesuai dengan kehendak Allah, dan jangan karena mau mencari keuntungan yang kotor, tetapi dengan pengabdian diri.", en: "Shepherd the flock of God which is among you, serving as overseers, not by compulsion but willingly, not for dishonest gain but eagerly;" },
+            { v: 3, id: "Janganlah kamu mau memerintah atas mereka yang dipercayakan kepadamu, tetapi hendaklah kamu menjadi teladan bagi kawanan domba itu.", en: "nor as being lords over those entrusted to you, but being examples to the flock;" },
+            { v: 4, id: "Maka kamu, apabila Gembala Agung menyatakan diri-Nya, kamu akan menerima mahkota kemuliaan yang tidak dapat layu.", en: "and when the Chief Shepherd appears, you will receive the crown of glory that does not fade away." },
+            { v: 5, id: "Demikian juga kamu, hai orang-orang muda, tunduklah kepada orang-orang yang tua. Dan kamu semua, rendahkanlah dirimu seorang terhadap yang lain, sebab: Allah menentang orang yang congkak, tetapi mengasihani orang yang rendah hati.", en: "Likewise you younger people, submit yourselves to your elders. Yes, all of you be submissive to one another, and be clothed with humility, for 'God resists the proud, But gives grace to the humble.'" },
+            { v: 6, id: "Karena itu rendahkanlah dirimu di bawah tangan Tuhan yang kuat, supaya kamu ditinggikan-Nya pada waktunya.", en: "Therefore humble yourselves under the mighty hand of God, that He may exalt you in due time," },
+            { v: 7, id: "Serahkanlah segala kekuatiranmu kepada-Nya, sebab Ia yang memelihara kamu.", en: "casting all your care upon Him, for He cares for you." },
+            { v: 8, id: "Sadarlah dan berjaga-jagalah! Lawanmu, si Iblis, berjalan keliling sama seperti singa yang mengaum-aum dan mencari orang yang dapat ditelannya.", en: "Be sober, be vigilant; because your adversary the devil walks about like a roaring lion, seeking whom he may devour." },
+            { v: 9, id: "Lawanlah dia dengan iman yang teguh, sebab kamu tahu, bahwa semua saudaramu di seluruh dunia menanggung penderitaan yang sama.", en: "Resist him, steadfast in the faith, knowing that the same sufferings are experienced by your brotherhood in the world." },
+            { v: 10, id: "Dan Allah, sumber segala kasih karunia, yang telah memanggil kamu dalam Kristus kepada kemuliaan-Nya yang kekal, akan melengkapi, meneguhkan, menguatkan dan mengokohkan kamu, sesudah kamu menderita seketika lamanya.", en: "But may the God of all grace, who called us to His eternal glory by Christ Jesus, after you have suffered a little while, perfect, establish, strengthen, and settle you." },
+            { v: 11, id: "Ialah yang empunya kuasa sampai selama-lamanya! Amin.", en: "To Him be the glory and the dominion forever and ever. Amen." },
+            { v: 12, id: "Dengan perantaraan Silvanus, yang kuanggap sebagai seorang saudara yang setia, aku menulis ringkas kepadamu untuk menasihati dan meyakinkan kamu, bahwa ini adalah kasih karunia yang benar-benar dari Allah. Berdirilah teguh di dalamnya!", en: "By Silvanus, our faithful brother as I consider him, I have written to you briefly, exhorting and testifying that this is the true grace of God in which you stand." },
+            { v: 13, id: "Salam kepadamu dari mereka yang di Babel, yang terpilih bersama-sama kamu, dan juga dari Markus, anakku.", en: "She who is in Babylon, elect together with you, greets you; and so does Mark my son." },
+            { v: 14, id: "Berilah salam seorang kepada yang lain dengan kecupan kasih. Damai sejahtera menyertai kamu sekalian yang berada dalam Kristus. Amin.", en: "Greet one another with a kiss of love. Peace to you all who are in Christ Jesus. Amen." }
+        ]
+    };
+
+    const dictionary = {
+        "dari": "from", "petrus": "Peter", "rasul": "apostle", "yesus": "Jesus", "kristus": "Christ",
+        "kepada": "to / toward", "orang-orang": "people", "pendatang": "pilgrims / strangers",
+        "yang": "which / who / that", "tersebar": "scattered / dispersion", "di": "in / at",
+        "yaitu": "namely / that is", "dipilih": "elect / chosen", "sesuai": "according to",
+        "dengan": "with", "rencana": "foreknowledge / plan", "allah": "God", "bapa": "Father",
+        "kita": "our / us", "dan": "and", "dikuduskan": "sanctified", "oleh": "by", "roh": "Spirit",
+        "supaya": "for / so that", "taat": "obedience / obey", "menerima": "receive", "percikan": "sprinkling",
+        "darah-nya": "His blood", "darah": "blood", "kiranya": "may", "kasih": "grace / love", 
+        "karunia": "gift / grace", "damai": "peace", "sejahtera": "prosperity / peace", "makin": "more",
+        "melimpah": "multiplied / abundant", "atas": "upon / over", "kamu": "you", "terpujilah": "blessed be",
+        "tuhan": "Lord", "karena": "because of", "rahmat-nya": "His mercy", "besar": "abundant / great",
+        "telah": "has / have", "melahirkan": "begotten / born", "kembali": "again", "kebangkitan": "resurrection",
+        "antara": "among", "mati": "dead", "suatu": "a / an", "hidup": "living / life", "penuh": "full",
+        "pengharapan": "hope", "untuk": "to / for", "bagian": "inheritance", "tidak": "not", "dapat": "can",
+        "binasa": "perish / incorruptible", "cemar": "undefiled / defiled", "layu": "fade away",
+        "tersimpan": "reserved", "sorga": "heaven", "bagi": "for", "kuasa": "power", "terpelihara": "kept",
+        "sebab": "through / because", "iman": "faith", "menuju": "towards", "keselamatan": "salvation",
+        "sedia": "ready", "dinyatakan": "revealed", "pada": "at / in", "akhir": "last", "zaman": "time / age",
+        "dalam": "in", "hal": "this / thing", "bersukacita": "rejoice", "walaupun": "though", "sementara": "now / temporarily",
+        "sedikit": "little", "masa": "while / time", "jikalau": "if", "wajib": "need be / necessary", "menanggung": "grieved / suffer",
+        "duka": "grief", "cita": "feeling", "berbagai-bagai": "various", "pencobaan": "trials", "maksud": "genuineness / purpose",
+        "semuanya": "all of this", "ialah": "is", "membuktikan": "tested / prove", "kemurnian": "genuineness / purity",
+        "imanmu": "your faith", "jauh": "much", "lebih": "more", "tinggi": "precious / high", "nilainya": "value",
+        "emas": "gold", "fana": "perishes / corruptible", "diuji": "tested", "api": "fire", "sehingga": "may be found / so that",
+        "memperoleh": "receiving / find", "puji-pujian": "praise", "kemuliaan": "glory", "kehormatan": "honor",
+        "hari": "day / revelation", "menyatakan": "manifest / reveal", "diri-nya": "Himself", "sekalipun": "though",
+        "belum": "not yet", "pernah": "ever", "melihat": "seen / see", "dia": "Him", "namun": "yet", "mengasihi-nya": "love Him",
+        "percaya": "believing / trust", "sekarang": "now", "bergembira": "rejoice", "mulia": "glory / glorious",
+        "terkatakan": "inexpressible", "mencapai": "receiving / achieve", "tujuan": "end / goal", "jiwamu": "your souls",
+        "itulah": "that", "diselidiki": "inquired", "diteliti": "searched carefully", "nabi-nabi": "prophets",
+        "bernubuat": "prophesied", "tentang": "about / concerning", "diuntukkan": "intended / come to", "mereka": "they / them",
+        "meneliti": "searching", "saat": "time", "mana": "which", "bagaimana": "what manner", "dimaksudkan": "indicating / meant",
+        "sebelumnya": "beforehand", "memberi": "testified / give", "kesaksian": "witness / testimony", "segala": "all",
+        "penderitaan": "sufferings", "menimpa": "follow / happen to", "menyusul": "follow", "kemudian": "later / afterwards",
+        "bukan": "not", "melayani": "ministering / serving", "diri": "themselves / self", "sendiri": "alone / own",
+        "tetapi": "but", "sesuatu": "things", "diberitakan": "reported / preached", "kudus": "Holy / pure", "diutus": "sent",
+        "menyampaikan": "preached / deliver", "berita": "gospel / news", "injil": "gospel", "hal-hal": "things",
+        "ingin": "desire", "diketahui": "look into / known", "malaikat-malaikat": "angels", "siapkanlah": "gird up",
+        "akal": "mind", "budimu": "understanding", "waspadalah": "be sober", "letakkanlah": "rest", "seluruhnya": "fully",
+        "dianugerahkan": "brought / graced", "kepadamu": "to you", "waktu": "time", "penyataan": "revelation",
+        "hiduplah": "live / conduct", "sebagai": "as", "anak-anak": "children", "jangan": "do not", "turuti": "conforming",
+        "hawa": "lusts", "nafsu": "desire / passion", "menguasai": "ruling / former", "kebodohanmu": "your ignorance",
+        "hendaklah": "be", "menjadi": "become", "seluruh": "all", "hidupmu": "your conduct / life", "sama": "same / just as",
+        "memanggil": "called", "ada": "it is", "tertulis": "written", "kuduslah": "be holy", "aku": "I am",
+        "menyebut-nya": "call on Him", "menghakimi": "judges", "semua": "all", "orang": "people / men", "menurut": "according to",
+        "perbuatannya": "work / deeds", "tidak memandang muka": "without partiality", "maka": "then", "ketakutan": "fear",
+        "selama": "throughout / during", "penumpanganmu": "your stay / sojourn", "dunia": "world", "ini": "this",
+        "tahu": "knowing / know", "ditebus": "redeemed", "cara": "conduct / way", "sia-sia": "aimless / vain",
+        "diwarisi": "received by tradition", "nenek": "forefathers", "moyangmu": "your fathers", "bukan dengan": "not with",
+        "barang": "things", "perak": "silver", "melainkan": "but", "mahal": "precious", "anak domba": "lamb",
+        "tak bernoda": "without blemish", "tak bercacat": "without spot", "ia": "He", "sebelum": "before",
+        "dijadikan": "foundation / made", "baru": "these / newly", "dialah": "Him", "membangkitkan": "raised",
+        "memuliakan-nya": "gave Him glory", "tertuju": "is in", "menyucikan": "purified", "dirimu": "your souls",
+        "ketaatan": "obeying", "kebenaran": "truth", "mengamalkan": "sincere / practice", "persaudaraan": "brethren",
+        "tulus": "sincere", "ikhlas": "pure", "bersungguh-sungguh": "fervently", "segenap": "pure / all",
+        "hatimu": "your heart", "saling": "one another", "benih": "seed", "kekal": "abides / eternal",
+        "rumput": "grass", "segala kemuliaannya": "all the glory of man", "bunga": "flower", "menjadi kering": "withers",
+        "gugur": "falls away", "firman": "word", "tetap": "endures", "selama-lamanya": "forever", "disampaikan": "preached",
+        "buanglah": "lay aside / cast out", "kejahatan": "malice / evil", "tipu": "deceit / guile", "muslihat": "trickery",
+        "kemunafikan": "hypocrisy", "kedengkian": "envy", "fitnah": "slander / evil speaking", "jadilah": "become",
+        "bayi": "babes / infants", "lahir": "born", "selalu": "always", "air susu": "milk", "murni": "pure",
+        "rohani": "spiritual", "tumbuh": "grow", "beroleh": "obtain", "mengecap": "tasted", "kebaikan": "gracious / goodness",
+        "datanglah": "coming", "batu": "stone / rock", "memang": "indeed", "dibuang": "rejected / discarded",
+        "manusia": "men / human", "terhormat": "precious / honorable", "hadapan": "sight / presence", "biarlah": "let",
+        "dipergunakan": "used", "pembangunan": "built up / construction", "rumah": "house", "imamatan": "priesthood",
+        "kudus": "holy", "mempersembahkan": "offer up", "korban": "sacrifices", "berkenan": "acceptable",
+        "kitab suci": "scripture", "sesungguhnya": "behold", "meletakkan": "lay / place", "sion": "Zion",
+        "pilihan": "elect / chosen", "penjuru": "cornerstone", "dipermalukan": "put to shame", "tukang-tukang": "builders",
+        "bangunan": "building", "sandungan": "stumbling", "sentuhan": "offense", "tersandug": "stumble",
+        "ditentukan": "appointed", "bangsa": "nation / generation", "rajani": "royal", "umat": "people",
+        "kepunyaan": "own / possession", "memberitakan": "proclaim / preach", "perbuatan-perbuatan": "praises / works",
+        "keluar": "out", "kegelapan": "darkness", "terang-nya": "His light", "ajaib": "marvelous / wonderful",
+        "dahulu": "once / formerly", "dikasihi": "obtained mercy", "rahmat": "mercy", "saudara-saudaraku": "beloved / brothers",
+        "kekasih": "beloved", "menasihati": "beg / exhort", "perantau": "pilgrims", "menjauhkan": "abstain",
+        "keinginan-keinginan": "lusts / desires", "daging": "flesh", "berjuang": "war / battle", "melawan": "against",
+        "jiwa": "soul", "milikilah": "have / maintain", "tengah-tengah": "among", "bukan yahudi": "Gentiles",
+        "apabila": "when", "memfitnah": "speak against / defame", "durjana": "evildoers", "melihatnya": "observe / see",
+        "perbuatan-perbuatanmu": "your good works", "melawat": "visitation", "tunduklah": "submit yourselves",
+        "lembaga": "ordinance / institution", "raja": "king", "pemegang": "holder", "kekuasaan": "authority / power",
+        "gubernur-gubernur": "governors", "menghukum": "punishment", "menghormati": "praise / honor", "kehendak": "will / intention",
+        "membungkamkan": "put to silence", "kepicikan": "ignorance", "bodoh": "foolish", "merdeka": "free",
+        "menyalahgunakan": "using as a cloak", "kemerdekaan": "liberty / freedom", "menyelubungi": "cloak / cover",
+        "hamba": "bondservants / servants", "saudara-saudara": "brotherhood", "takutlah": "fear", "hai": "hey / words of address",
+        "hamba-hamba": "servants", "ketakutan": "fear", "tuanmu": "masters", "saja": "only", "peramah": "gentle",
+        "bengis": "harsh / cruel", "kesadaran": "conscience / awareness", "pujian": "credit / praise", "menderita": "suffer",
+        "pukulan": "beaten", "dosa": "sin", "dipanggil": "called", "pun": "also", "meninggalkan": "leaving",
+        "teladan": "example", "bagimu": "for you", "mengikuti": "follow", "jejak-nya": "His steps", "mulut-nya": "His mouth",
+        "dicaci maki": "reviled", "membalas": "return / reply", "mengancam": "threaten", "menyerahkannya": "committed Himself",
+        "adil": "righteously / justly", "memikul": "bore / carry", "tubuh-nya": "His body", "kayu salib": "tree / cross",
+        "bilur-bilur-nya": "whose stripes", "sembuh": "healed", "sesat": "astray / lost", "domba": "sheep",
+        "gembala": "Shepherd", "pemelihara": "Overseer / Guardian", "isteri-isteri": "wives", "suamimu": "husbands",
+        "perkataan": "word", "dimenangkan": "won", "kelakuan": "conduct", "salehnya": "chaste / holy",
+        "perhiasanmu": "adornment", "lahiriah": "outward", "memilin-milin": "arranging / braiding", "rambut": "hair",
+        "mengenakan": "putting on", "pakaian": "apparel / clothing", "indah-indah": "fine / beautiful", "batiniah": "inward / hidden",
+        "tersembunyi": "hidden", "berasal": "comes from", "lemah lembut": "gentle / meek", "tenteram": "quiet / peaceful",
+        "sangat": "very", "berharga": "precious", "caranya": "manner / way", "perempuan-perempuan": "women / wives",
+        "berdandan": "adorned themselves", "menaruh": "trusted / put", "sara": "Sarah", "abraham": "Abraham",
+        "tuannya": "lord", "anak-anaknya": "daughters", "takut": "afraid", "ancaman": "terror / threat",
+        "suami-suami": "husbands", "bijaksana": "understanding / wise", "isterimu": "wife", "kaum": "vessel / group",
+        "lemah": "weaker", "teman": "heirs together / friends", "pewaris": "heirs", "kehidupan": "life",
+        "doamu": "prayers", "terhalang": "hindered", "akhirnya": "finally", "seia sekata": "of one mind",
+        "seperasaan": "compassion", "penyayang": "tender-hearted", "rendah hati": "courteous / humble", "memberkati": "blessing",
+        "berkat": "blessing", "mencintai": "love", "hari-hari": "days", "menjaga": "refrain / keep",
+        "lidahnya": "tongue", "bibirnya": "lips", "ucapan-ucapan": "speaking", "menipu": "deceit",
+        "menjauhi": "turn away", "melakukan": "do", "mencari": "seek", "perdamaian": "peace",
+        "mengejarnya": "pursue it", "mata": "eyes", "telinga-nya": "ears", "permohonan": "prayers",
+        "minta tolong": "cry / help", "wajah": "face", "menentang": "against", "siapakah": "who",
+        "harm": "harm / berbuat jahat", "rajin": "followers / zealous", "berbahagia": "blessed / happy", "takuti": "afraid / fear",
+        "gentar": "troubled", "hatimu": "hearts", "siap sedialah": "always be ready", "pertanggungjawaban": "defense / account",
+        "tiap-tiap": "everyone", "meminta": "asks", "alasan": "reason / tentang", "hormat": "fear / respect",
+        "hati nurani": "conscience", "defame": "memfitnah", "malu": "ashashed", "fitnahan": "revile",
+        "dikehendaki": "will", "satu kali": "once", "membawa": "bring", "dibunuh": "put to death",
+        "keadaan-nya": "flesh / state", "pergi": "went", "penjara": "prison", "nuh": "Noah",
+        "menanti": "waited", "sabar": "longsuffering", "sedang": "while", "mempersiapkan": "preparing",
+        "bahteranya": "ark", "delapan": "eight", "diselamakan": "saved", "air bah": "water",
+        "kiasannya": "antitype / picture", "baptisan": "baptism", "membersihkan": "removal", "kenajisan": "filth",
+        "jasmani": "flesh", "memohon": "answer / appeal", "sebelah kanan": "right hand", "naik": "gone into / ascended",
+        "malaikat": "angels", "kekuatan": "powers", "ditundukkan": "made subject", "sengsara": "suffered / passion",
+        "mempersenjatai": "arm yourselves", "pikiran": "mind", "berhenti": "ceased", "sisa": "rest / remaining",
+        "gunakan": "live / use", "cukup": "enough", "banyak": "past / much", "pergunakan": "spent / used",
+        "mengenal": "know", "rupa-rupa": "lewdness / various", "hawa nafsu": "lusts", "keinginan": "lusts",
+        "kemabukan": "drunkenness", "pesta pora": "revelries", "perjamuan minum": "drinking parties", "penyembahan berhala": "idolatries",
+        "terlarang": "abominable", "heran": "think strange / wonder", "turut": "run with", "berlari": "run",
+        "bersama-sama": "together", "kubangan": "flood", "ketertiban": "dissipation", "menghakimi": "judge",
+        "secara badani": "according to men in the flesh", "kesudahan": "end", "dekat": "at hand",
+        "kuasailah": "be serious / master", "tenang": "watchful / calm", "berdoa": "prayers", "terutama": "above all things",
+        "sungguh-sungguh": "fervent", "seorang akan yang lain": "one another", "menutupi": "cover", "banyak sekali": "multitude",
+        "tumpangan": "hospitable / hospitality", "bersungut-sungut": "grumbling", "layanilah": "minister", "pengurus": "stewards",
+        "berbicara": "speaks", "baiklah": "let him", "menyampaikan": "oracles / deliver", "kekuatan": "ability / strength",
+        "dianugerahkan": "supplies / gifted", "dimuliakan": "glorified", "empunya": "belong", "dominion": "kuasa",
+        "selama-lamanya": "forever and ever", "amin": "amen", "saudara-saudara": "beloved", "nyala api": "fiery",
+        "siksaan": "trial", "ujian": "try / test", "seolah-olah": "as though", "luar biasa": "strange thing",
+        "terjadi": "happened", "sebaliknya": "but / on the contrary", "bagian": "partake", "penderitaan": "sufferings",
+        "boleh": "may", "dicela": "reproached", "nama": "name", "kemuliaan": "glory", "rests": "ada pada",
+        "pembunuh": "murderer", "pencuri": "thief", "penjahat": "evildoer", "pengacau": "busybody",
+        "kristen": "Christian", "melainkan": "but", "tibanya": "come", "penghakiman": "judgment",
+        "dimulai": "begin", "terdahulu": "first", "bagaimanakah": "what", "tidak menaati": "do not obey",
+        "hampir-hampir": "scarcely", "diselamatkan": "saved", "orang fasik": "ungodly", "orang berdosa": "sinner",
+        "mempercayakan": "commit", "pencipta": "Creator", "setia": "faithful", "sambil": "while",
+        "terus": "continuing", "penatua": "elders", "menasihatkan": "exhort", "saksi": "witness",
+        "kelak": "revealed / later", "gembalakanlah": "shepherd", "kawanan domba": "flock", "paksa": "compulsion",
+        "sukarela": "willingly", "keuntungan": "gain", "kotor": "dishonest", "pengabdian diri": "eagerly / devotion",
+        "memerintah": "being lords", "dipercayakan": "entrusted", "gembala agung": "Chief Shepherd", "mahkota": "crown",
+        "orang-orang muda": "younger people", "orang-orang yang tua": "elders", "rendahkanlah": "humble yourselves",
+        "congkak": "proud", "mengasihani": "gives grace", "rendah hati": "humble", "tangan": "hand",
+        "kuat": "mighty", "ditinggikan-nya": "exalt you", "waktunya": "due time", "serahkanlah": "casting",
+        "kekuatiranmu": "your care", "memelihara": "cares for", "sadarlah": "be sober", "berjaga-jagalah": "be vigilant",
+        "lawanmu": "your adversary", "iblis": "devil", "berjalan keliling": "walks about", "singa": "lion",
+        "mengaum-aum": "roaring", "ditelannya": "devour", "lawanlah": "resist", "teguh": "steadfast",
+        "seluruh dunia": "world", "sumber": "source", "melengkapi": "perfect", "meneguhkan": "establish",
+        "menguatkan": "strengthen", "mengokohkan": "settle", "seketika lamanya": "a little while", "perantaraan": "by",
+        "silvanus": "Silvanus", "kuanggap": "I consider", "saudara": "brother", "menulis": "written",
+        "ringkas": "briefly", "meyakinkan": "testifying / assuring", "berdirilah": "stand", "salam": "greets / greetings",
+        "babel": "Babylon", "markus": "Mark", "anakku": "my son", "kecupan": "kiss", "sekalian": "all",
+        "berada": "are"
+    };
+
+    let systemVoices = [];
+    function loadVoices() {
+        if (typeof speechSynthesis === 'undefined') return;
+        systemVoices = window.speechSynthesis.getVoices();
+    }
+    
+    if (typeof speechSynthesis !== 'undefined') {
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+        loadVoices();
+    }
+
+    function buildVocabForVerse(verseObj) {
+        const cleanId = verseObj.id.replace(/[.,\/#!$%\^&\*;:{}=\_`~()""'']/g, "").replace(/\s+/g, " ");
+        const wordsId = cleanId.trim().split(" ");
+        
+        return wordsId.map((indonesianWord) => {
+            const word = indonesianWord.trim();
+            const hintDisplay = word.length > 1 ? `${word.charAt(0)}...` : `${word.charAt(0)}`;
+            return {
+                english: hintDisplay, 
+                indonesian: word
+            };
+        });
+    }
+
+    const chapterSelector = document.getElementById("chapter-select");
+    const verseSelector = document.getElementById("verse-select");
+
+    function populateVersesForChapter(chapterNum) {
+        verseSelector.innerHTML = "";
+        const verses = fullBibleData[chapterNum];
+        verses.forEach((item, index) => {
+            const option = document.createElement("option");
+            option.value = index;
+            option.textContent = `Ayat ${item.v}`;
+            verseSelector.appendChild(option);
+        });
+    }
+
+    let currentChapter = 1;
+    let currentVerseIndex = 0; 
+    let currentWordIndex = 0; 
+    let activeVocabList = [];
+    let targetCleanedWord = ""; 
+    
+    let verseScore = 0;
+    let verseTotalQuestions = 0;
+    let isQuestionFinished = false;
+    let hintActive = false;
+    let appState = "OVERVIEW"; 
+
+    const boxesContainer = document.getElementById("letter-boxes-container");
+    const feedbackDisplay = document.getElementById("feedback");
+    const submitBtn = document.getElementById("submit-btn");
+    const scoreBox = document.getElementById("score-box");
+    const hintBtn = document.getElementById("hint-btn");
+
+    function handleChapterChange() {
+        currentChapter = parseInt(chapterSelector.value, 10);
+        populateVersesForChapter(currentChapter);
+        verseSelector.value = 0;
+        updateOverviewDisplay();
+    }
+
+    function updateOverviewDisplay() {
+        if (typeof speechSynthesis !== 'undefined') window.speechSynthesis.cancel(); 
+        currentVerseIndex = parseInt(verseSelector.value, 10);
+        const currentVerse = fullBibleData[currentChapter][currentVerseIndex];
+        document.getElementById("overview-id").textContent = `${currentVerse.v}. ${currentVerse.id}`;
+        document.getElementById("overview-en").textContent = currentVerse.en;
+    }
+
+    function showVerseOverview() {
+        appState = "OVERVIEW";
+        chapterSelector.value = currentChapter;
+        populateVersesForChapter(currentChapter);
+        verseSelector.value = currentVerseIndex;
+        updateOverviewDisplay();
+        
+        document.getElementById("quiz-screen").style.display = "none";
+        document.getElementById("verse-screen").style.display = "block";
+        document.getElementById("start-test-btn").focus();
+    }
+
+    function speakVerseText() {
+        const currentVerse = fullBibleData[currentChapter][currentVerseIndex];
+        executeSpeech(currentVerse.id);
+    }
+
+    function speakCurrentWord() {
+        const currentItem = activeVocabList[currentWordIndex];
+        
+        let cleanWord = currentItem.indonesian
+            .replace(/[.,\/#!$%\^&\*;:{}=\_`~()""'']/g, "")
+            .trim()
+            .toLowerCase();
+            
+        cleanWord = cleanWord.replace(/-/g, " ");
+        executeSpeech(cleanWord);
+    }
+
+    function executeSpeech(textToSay) {
+        if (typeof responsiveVoice !== 'undefined' && responsiveVoice.voiceSupport()) {
+            responsiveVoice.cancel();
+            responsiveVoice.speak(textToSay, "Indonesian Female", { rate: 0.85, pitch: 1.0 });
+            return;
+        }
+
+        if (typeof speechSynthesis === 'undefined') return;
+        window.speechSynthesis.cancel(); 
+
+        const utterance = new SpeechSynthesisUtterance(textToSay);
+        utterance.lang = 'id-ID'; 
+        
+        if (systemVoices.length === 0) loadVoices();
+        const androidIndonesianVoice = systemVoices.find(voice => 
+            voice.lang === 'id-ID' || voice.lang === 'id_ID' || voice.lang.startsWith('id')
+        );
+        if (androidIndonesianVoice) utterance.voice = androidIndonesianVoice;
+        
+        utterance.rate = 0.80;  
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function lookupTranslation() {
+        if (isQuestionFinished) return;
+        const currentItem = activeVocabList[currentWordIndex];
+        const cleanSearchKey = currentItem.indonesian.toLowerCase().replace(/[^a-z\-]/g, "");
+        
+        const translation = dictionary[cleanSearchKey] || "Helper unavailable for this dynamic modifier term.";
+        alert(`Arti Bahasa Inggris (English Translation):\n"${currentItem.indonesian}" ➔ ${translation}`);
+    }
+
+    if (currentWordIndex >= activeVocabList.length) {
+        currentVerseIndex++;
+        if (currentVerseIndex >= fullBibleData[currentChapter].length) {
+            currentVerseIndex = 0;
+            currentChapter++;
+            if (currentChapter > 5) currentChapter = 1;
+        }
+        showVerseOverview();
+    }
+
+    function startQuizForSelectedVerse() {
+        currentWordIndex = 0;
+        const rawVerseObj = fullBibleData[currentChapter][currentVerseIndex];
+        activeVocabList = buildVocabForVerse(rawVerseObj);
+
+        verseScore = 0;
+        verseTotalQuestions = 0;
+        
+        appState = "TESTING";
+        document.getElementById("verse-screen").style.display = "none";
+        document.getElementById("quiz-screen").style.display = "block";
+        
+        document.getElementById("quiz-verse-heading").textContent = `1 Petrus ${currentChapter}:${rawVerseObj.v}`;
+        scoreBox.innerHTML = `Skor Ayat Ini: <span id="score-val">0</span> / <span id="total-val">0</span>`;
+        
+        loadQuestion();
+    }
+
+    function generateLetterBoxes(word) {
+        boxesContainer.innerHTML = "";
+        targetCleanedWord = word.replace(/[^a-zA-Z\-]/g, "");
+
+        for (let i = 0; i < targetCleanedWord.length; i++) {
+            if (targetCleanedWord[i] === "-") {
+                const hyphen = document.createElement("span");
+                hyphen.textContent = "-";
+                hyphen.style.fontSize = "20px";
+                hyphen.style.fontWeight = "bold";
+                hyphen.style.alignSelf = "center";
+                boxesContainer.appendChild(hyphen);
+                continue;
+            }
+
+            const input = document.createElement("input");
+            input.type = "text";
+            input.maxLength = 1;
+            input.className = "letter-input";
+            input.dataset.index = i;
+            
+            input.addEventListener("input", function() {
+                if (hintActive) return;
+                const userLetter = this.value.trim().toLowerCase();
+                const correctLetter = targetCleanedWord[i].toLowerCase();
+
+                if (userLetter === "") {
+                    this.className = "letter-input";
+                    return;
+                }
+                if (userLetter === correctLetter) {
+                    this.className = "letter-input correct-letter";
+                } else {
+                    this.className = "letter-input wrong-letter";
+                }
+
+                let nextIdx = i + 1;
+                if (targetCleanedWord[nextIdx] === "-") nextIdx++;
+                const next = boxesContainer.querySelector(`[data-index="${nextIdx}"]`);
+                if (next) next.focus();
+            });
+
+            input.addEventListener("keydown", function(e) {
+                if (hintActive) return;
+                if (e.key === "Backspace") {
+                    this.className = "letter-input";
+                    if (this.value.length === 0) {
+                        let prevIdx = i - 1;
+                        if (targetCleanedWord[prevIdx] === "-") prevIdx--;
+                        const prev = boxesContainer.querySelector(`[data-index="${prevIdx}"]`);
+                        if (prev) {
+                            prev.focus();
+                            prev.value = "";
+                            prev.className = "letter-input";
+                        }
+                    }
+                }
+            });
+
+            boxesContainer.appendChild(input);
+        }
+        refocusFirstInput();
+    }
+
+    function refocusFirstInput() {
+        if(boxesContainer.children.length > 0) {
+            const firstInput = boxesContainer.querySelector(".letter-input");
+            if(firstInput) firstInput.focus();
+        }
+    }
+
+    function triggerFlashHint() {
+        if (isQuestionFinished || hintActive) return;
+        
+        hintActive = true;
+        hintBtn.disabled = true;
+        const inputs = boxesContainer.querySelectorAll(".letter-input");
+        
+        inputs.forEach((input) => {
+            const idx = parseInt(input.dataset.index, 10);
+            input.value = targetCleanedWord[idx];
+            input.className = "letter-input correct-letter";
+            input.disabled = true;
+        });
+
+        setTimeout(() => {
+            inputs.forEach((input) => {
+                input.value = "";
+                input.className = "letter-input";
+                input.disabled = false;
+            });
+            hintActive = false;
+            hintBtn.disabled = false;
+            refocusFirstInput();
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        isQuestionFinished = false;
+        hintBtn.disabled = false;
+        const currentItem = activeVocabList[currentWordIndex];
+        
+        document.getElementById("question-number-display").textContent = `Kata #${currentWordIndex + 1} dari ${activeVocabList.length}`;
+        document.getElementById("english-word").textContent = currentItem.english;
+        
+        generateLetterBoxes(currentItem.indonesian);
+        submitBtn.textContent = "Selesai & Periksa";
+        feedbackDisplay.textContent = "";
+    }
+
+    function submitAnswer() {
+        if (hintActive) return;
+        const currentItem = activeVocabList[currentWordIndex];
+        const targetWord = currentItem.indonesian.toLowerCase().replace(/[^a-zA-Z]/g, "");
+        const inputs = boxesContainer.querySelectorAll(".letter-input");
+        let userWord = "";
+        let allCorrect = true;
+
+        inputs.forEach((input) => {
+            userWord += input.value.trim().toLowerCase();
+        });
+
+        let inputIdx = 0;
+        for(let i=0; i<targetCleanedWord.length; i++) {
+            if(targetCleanedWord[i] === "-") continue;
+            const input = inputs[inputIdx];
+            if(input) {
+                if(input.value.trim().toLowerCase() !== targetCleanedWord[i].toLowerCase()) {
+                    allCorrect = false;
+                    input.className = "letter-input wrong-letter";
+                } else {
+                    input.className = "letter-input correct-letter";
+                }
+                input.disabled = true;
+            }
+            inputIdx++;
+        }
+
+        verseTotalQuestions++;
+        document.getElementById("total-val").textContent = verseTotalQuestions;
+
+        if (allCorrect && userWord.length === targetWord.length) {
+            verseScore++;
+            document.getElementById("score-val").textContent = verseScore;
+            feedbackDisplay.textContent = "Luar biasa! Benar semua! 🎉";
+            feedbackDisplay.className = "feedback correct-text";
+        } else {
+            feedbackDisplay.textContent = `Belum tepat. Jawaban benar: ${currentItem.indonesian.toUpperCase()}`;
+            feedbackDisplay.className = "feedback wrong-text";
+        }
+
+        isQuestionFinished = true;
+        hintBtn.disabled = true;
+        submitBtn.textContent = "Kata Selanjutnya";
+        submitBtn.focus();
+    }
+
+    function advanceToNextWord() {
+        currentWordIndex++;
+        if (currentWordIndex >= activeVocabList.length) {
+            currentVerseIndex++;
+            if (currentVerseIndex >= fullBibleData[currentChapter].length) {
+                currentVerseIndex = 0;
+                currentChapter++;
+                if (currentChapter > 5) {
+                    currentChapter = 1;
+                }
+            }
+            showVerseOverview();
+        } else {
+            loadQuestion();
+        }
+    }
+
+    function handleButtonClick() {
+        if (!isQuestionFinished) {
+            submitAnswer();
+        } else {
+            advanceToNextWord();
+        }
+    }
+
+    window.addEventListener("keydown", function(event) {
+        if (hintActive) return;
+
+        if (event.key === "Enter") {
+            event.preventDefault(); 
+            if (appState === "OVERVIEW") {
+                startQuizForSelectedVerse();
+            } else {
+                handleButtonClick();
+            }
+        }
+        
+        if ((event.key === "h" || event.key === "H") && appState === "TESTING" && !isQuestionFinished) {
+            if (document.activeElement.tagName !== "INPUT" || document.activeElement.value !== "") {
+                triggerFlashHint();
+            }
+        }
+    });
+
+    // Initialize layout
+    populateVersesForChapter(1);
+    updateOverviewDisplay();
+</script>
+
+</body>
+</html>
